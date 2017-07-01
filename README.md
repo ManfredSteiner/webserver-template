@@ -65,7 +65,10 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to prettify your HTML response using *Bootstrap*.
   + How to simplify creation of HTML response using the rendering engine *pug*.
 
-
+* [ step2-provide-ng2-app ](docs/step2-provide-ng2-app.md)  
+  + How to support the Angular 2+ application from express web-server.
+  + How to use a [spinner element][npm-spin] to indicate Angular application loading.
+  
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
 [angular]: https://angular.io/
