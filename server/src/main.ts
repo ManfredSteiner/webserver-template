@@ -19,6 +19,11 @@ pugEngine.locals.pretty = true;
 
 // middleware for web-server
 serverApp.use(requestHandler);
+serverApp.use(express.static(path.join(__dirname, 'public')));
+serverApp.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+serverApp.get('/error', handleGetError);
+serverApp.use(error404Handler);
+serverApp.use(errorHandler);
 
 // start of application
 const server = http.createServer(serverApp).listen(8080);
@@ -39,4 +44,26 @@ function requestHandler (req: express.Request, res: express.Response, next: expr
     next();
   }
 }
+
+function handleGetError () {
+  throw new Error('This simulates an excaption....');
+}
+
+
+function error404Handler (req: express.Request, res: express.Response, next: express.NextFunction) {
+  res.status(404).render('error404.pug');
+}
+
+
+function errorHandler (err: express.Errback, req: express.Request, res: express.Response, next: express.NextFunction) {
+  const ts = new Date().toISOString();
+  debug.warn('Error %s\n%e', ts, err);
+  res.status(500).render('error500.pug',
+    {
+      time: ts,
+      href: 'mailto:max@mustermann.com?subject=' + ts,
+      serveradmin: 'Max Mustermann'
+    });
+}
+
 
