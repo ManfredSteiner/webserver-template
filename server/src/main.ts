@@ -21,6 +21,7 @@ pugEngine.locals.pretty = true;
 serverApp.use(requestHandler);
 serverApp.use(express.static(path.join(__dirname, 'public')));
 serverApp.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
+serverApp.use('/ng2', express.static(path.join(__dirname, '../../ng2/dist')));
 serverApp.get('/error', handleGetError);
 serverApp.use(error404Handler);
 serverApp.use(errorHandler);
@@ -36,21 +37,22 @@ debug.info('Server running on port 8080');
 
 function requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
   const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
+  debug.info('%s %s from %s', req.method, req.url, clientSocket);
   if (req.method === 'GET' && req.url === '/') {
-    debug.info('%s %s from %s', req.method, req.url, clientSocket);
-    res.send('It works');
+    res.render('ngmain.pug');
   } else {
-    debug.warn('%s %s from %s', req.method, req.url, clientSocket);
     next();
   }
 }
 
 function handleGetError () {
-  throw new Error('This simulates an excaption....');
+  throw new Error('This simulates an exception....');
 }
 
 
 function error404Handler (req: express.Request, res: express.Response, next: express.NextFunction) {
+  const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
+  debug.warn('Error 404 for %s %s from %s', req.method, req.url, clientSocket);
   res.status(404).render('error404.pug');
 }
 

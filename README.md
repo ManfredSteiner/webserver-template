@@ -1,34 +1,35 @@
-# Express middleware, Bootstrap, pug
+# Angular 2+ application via Express Web-Server
 
 ## Goals
 
-* How to use the rendering engine **[pug][pug]** (recent name *jade*) to generate HTML response.
-* How to create and insert express middleware to create HTTP 404 errors (Not found) and HTTP 500 errors (Internal Server Error) in case of exceptions.
-* How to use **[Bootstrap][bootstrap]**, the ...
-  > *most popular HTML, CSS and JS framework for developing responsive,     mobile first projects on the web.*
-
-  ... in order to prettify the HTML response
+* How to support the Angular 2+ application from express web-server.
+* How to use a [spinner element][npm-spin] to indicate Angular application loading.
 
 ## Prerequisites
 
-Install the module **bootstrap**:
+Install the module **spin**:
 
 ```
 cd server
-npm install --save bootstrap
+npm install --save spin
+cd ..
+```
+Make sure, that the Angular 2+ application bundles are available in subdirectory [ng2/dist](ng2/dist). Use the following command (or keyboard shortcut *CTRL + N* ) to build them:
+
+```
+cd ng2
+ng build
+cd ..
 ```
 
 ## New files
 
-* [server/src/views/links.pug](server/src/views/links.pug)
-* [server/src/views/error404.pug](server/src/views/error404.pug)
-* [server/src/views/error500.pug](server/src/views/error500.pug)
+* [src/views/ngmain.pug](src/views/ngmain.pug)
 
-## Modified files
+## Modified source files
 
 * [server/src/main.ts](server/src/main.ts)
 
 
 
-[pug]: https://pugjs.org/api/getting-started.html
-[bootstrap]: http://getbootstrap.com/
+[npm-spin]: https://www.npmjs.com/package/spin

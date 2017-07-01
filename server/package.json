@@ -25,7 +25,8 @@
     "debug": "^2.6.8",
     "debug-sx": "^0.1.6",
     "express": "^4.15.3",
-    "pug": "^2.0.0-rc.2"
+    "pug": "^2.0.0-rc.2",
+    "spin": "0.0.1"
   },
   "devDependencies": {
     "del": "^3.0.0",
