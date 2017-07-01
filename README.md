@@ -24,6 +24,10 @@ npm install --save bootstrap
 * [server/src/views/error404.pug](server/src/views/error404.pug)
 * [server/src/views/error500.pug](server/src/views/error500.pug)
 
+## Modified files
+
+* [server/src/main.ts](server/src/main.ts)
+
 
 
 [pug]: https://pugjs.org/api/getting-started.html
