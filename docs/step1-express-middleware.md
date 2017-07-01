@@ -9,21 +9,3 @@
 
   ... in order to prettify the HTML response
 
-## Prerequisites
-
-Install the module **bootstrap**:
-
-```
-cd server
-npm install --save bootstrap
-```
-
-## New files
-
-* [server/src/views/links.pug](server/src/views/links.pug)
-* [server/src/views/error404.pug](server/src/views/error404.pug)
-* [server/src/views/error500.pug](server/src/views/error500.pug)
-
-
-
-[pug]: https://pugjs.org/api/getting-started.html
