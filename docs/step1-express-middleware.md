@@ -9,3 +9,4 @@
 
   ... in order to prettify the HTML response
 
+[pug]: https://pugjs.org/api/getting-started.html
