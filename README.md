@@ -44,7 +44,7 @@ There are many extensions available. It' strongly recommended to install the fol
 
 * TSLint
 
-The Web-Server subproject is using [Gulp][gulp] as building control tool. To combine some actions with keyboard shortcuts, copy the content of [.vscode/keybindings.json](file://.vscode/keybindings.json) to your personal Keyboard shortcut definition (menu *File->Preferences->Keyboard Shortcuts*). Then the following keyboard shortcuts are available:
+The Web-Server subproject is using [Gulp][gulp] as building control tool. To combine some actions with keyboard shortcuts, copy the content of [.vscode/keybindings.json](.vscode/keybindings.json) to your personal Keyboard shortcut definition (menu *File->Preferences->Keyboard Shortcuts*). Then the following keyboard shortcuts are available:
 
 * CTRL + C ... Clean project
 * CTRL + V ... Clean and build project
