@@ -56,7 +56,14 @@ To start the Web-Server press:
 * F5 ... start in debugging mode
 * CTRL + F5 ... start normal (without debugging)
 
+## Branches
 
+Use command `git checkout <branch>` to get one of the following branches:
+
+* [step1-express-middleware](docs/step1-express-middleware.md)  
+  + How to create and insert middleware functionality to the web-server.
+  + How to prettify your HTML response using *Bootstrap*.
+  + How to simplify creation of HTML response using the rendering engine *pug*.
 
 
 [nodejs]: https://nodejs.org/en/
