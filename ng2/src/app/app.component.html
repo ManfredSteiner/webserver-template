@@ -1,20 +1,7 @@
-<!--The whole content below can be removed with the new code.-->
-<div class="container header">
-  <h1>
-    Welcome to {{title}}!!
-  </h1>
-  <img src="assets/circle.svg" />
+<div *ngIf="!user" class="container">
+  <app-login></app-login>
 </div>
-<div class="container">
-  <p>Current time: <app-time *ngIf="showTime"></app-time></p>
-  <p class="bg-success">Date/Time: {{createdAt}}</p>
-  <div class="form-group">
-    <label for="exampleInputName">Name</label>
-    <input class="form-control" #tfname (keyup)="onName(tfname.value)" placeholder="Name">
-  </div>
-  <button class="btn btn-default" (click)="onClickMe()">Click me</button>
-</div>
-<div class="container">
-  <p class="bg-warn" *ngIf="clickCnt > 0">Clicked: {{clickCnt}}</p>
-  <p class="bg-warn" *ngIf="name">Name: {{name}}</p>
+<div *ngIf="user" class="container">
+  <h1>Welcome {{user.firstname}} {{user.surname}}</h1>
+  <p>You are logged in!</p>
 </div>

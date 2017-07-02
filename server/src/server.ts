@@ -3,6 +3,9 @@ import * as express from 'express';
 import * as path from 'path';
 import * as morgan from 'morgan';
 import * as nconf from 'nconf';
+import * as bodyParser from 'body-parser';
+
+const cors = require('cors');
 
 // import of Node.js modules
 import * as net from 'net';
@@ -41,12 +44,18 @@ export class Server {
     const pugEngine = this._app.set('view engine', 'pug');
     pugEngine.locals.pretty = true;
 
+    // the first middleware cors is only needed when the Angular 2+
+    // application is started separatly with ng serve!
+    this._app.use(cors());
     this._app.use(this._logger);
     this._app.use(this.requestHandler.bind(this));
     this._app.use(express.static(path.join(__dirname, 'public')));
     this._app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
     this._app.use('/ng2', express.static(path.join(__dirname, '../../ng2/dist')));
+    this._app.use('/assets', express.static(path.join(__dirname, '../../ng2/dist/assets')));
     this._app.get('/error', this.handleGetError.bind(this));
+    this._app.use(bodyParser.json());
+    this._app.post('/login', this.handlePostLogin.bind(this));
     this._app.use(this.error404Handler.bind(this));
     this._app.use(this.errorHandler.bind(this));
   }
@@ -100,6 +109,16 @@ export class Server {
     throw new Error('This simulates an exception....');
   }
 
+
+  private handlePostLogin (req: express.Request, res: express.Response, next: express.NextFunction) {
+    const data = req.body;
+    if (!data || typeof(data.htlid) !== 'string' || typeof(data.password) !== 'string' ||
+        (data.htlid.length !== 2 && data.htlid.length !== 8) ) {
+      res.status(400).json({ 'error' : 'Missing or wrong parameters' });
+      return;
+    }
+    res.json({ htlid: data.htlid, firstname: 'Max', surname: 'Mustermann'});
+  }
 
   private error404Handler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
