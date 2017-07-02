@@ -68,6 +68,13 @@ Use command `git checkout <branch>` to get one of the following branches:
 * [ step2-provide-ng2-app ](docs/step2-provide-ng2-app.md)  
   + How to support the Angular 2+ application from express web-server.
   + How to use a [spinner element][npm-spin] to indicate Angular application loading.
+
+* [step3-server-oop-and-logging](step3-server-oop-and-logging)
+  + How to use the logger module [morgan][npm-morgan].
+  + How to implement the server as object.
+  + How to use config files with the module [nconf][npm-nconf]
+  + How to filter [debug-sx][npm-debug-sx] messages.
+  + How to act on client connect and disconnect
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
@@ -75,4 +82,6 @@ Use command `git checkout <branch>` to get one of the following branches:
 [angular-cli]: https://cli.angular.io/
 [vsc]: https://code.visualstudio.com/
 [gulp]: http://gulpjs.com/
-
+[npm-morgan]: https://www.npmjs.com/package/morgan
+[npm-nconf]: https://www.npmjs.com/package/nconf
+[npm-debug-sx]: https://www.npmjs.com/package/debug-sx
