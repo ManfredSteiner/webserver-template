@@ -1,4 +1,4 @@
-# Working with Angular 2+ components
+# Creating and handling a login form
 
 ## Goals
 
@@ -51,7 +51,7 @@ Or you can start the Angular application via `ng serve`, and start the express s
 #### New files
 
 * [ng2/src/assets/logo.svg](ng2/src/assets/logo.svg)
-* [ng2/src/app/service/user.service.ts](ng2/src/app/service/user.service.ts)
+* [ng2/src/app/services/user.service.ts](ng2/src/app/services/user.service.ts)
 * [ng2/src/app/login.component.ts](ng2/src/app/login.component.ts)
 
 #### Modified source files
