@@ -75,6 +75,10 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to use config files with the module [nconf][npm-nconf]
   + How to filter [debug-sx][npm-debug-sx] messages.
   + How to act on client connect and disconnect
+
+* [step4-professional-logging](../../blob/step4-professional-logging/README.md)
+  + How to use [debug-sx][npm-debug-sx] handlers.
+  + How to configure logging by config file.
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
