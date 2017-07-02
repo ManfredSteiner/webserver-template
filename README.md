@@ -79,6 +79,15 @@ Use command `git checkout <branch>` to get one of the following branches:
 * [step4-professional-logging](../../blob/step4-professional-logging/README.md)
   + How to use [debug-sx][npm-debug-sx] handlers.
   + How to configure logging by config file.
+
+* [step5-ng2-component](../../blob/step5-ng2-component/README.md)
+  + How to show object attributes in components' HTML.
+  + How to call object methods caused by HTML button click.
+  + How to insert an image into the component's HTML.
+  + How to use of [Bootstrap CSS][bootstrap-css] in Angular components.
+  + How to create a new Angular 2+ component.
+  + How to use the component's lifecycle to implement a time view.
+  + How to use then module [sprintf-js][npm-sprintf-js] to format strings.
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
@@ -89,3 +98,6 @@ Use command `git checkout <branch>` to get one of the following branches:
 [npm-morgan]: https://www.npmjs.com/package/morgan
 [npm-nconf]: https://www.npmjs.com/package/nconf
 [npm-debug-sx]: https://www.npmjs.com/package/debug-sx
+[bootstrap-css]: http://getbootstrap.com/css/
+[npm-sprintf-js]: https://www.npmjs.com/package/sprintf-js
+
