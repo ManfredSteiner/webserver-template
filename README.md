@@ -17,7 +17,7 @@ See previous step.
 ## New files
 
 * [ng2/src/assets/circle.svg](ng2/src/assets/circle.svg)
-* [ng2/src/app/timer.component.ts](ng2/src/app/timer.component.ts)
+* [ng2/src/app/time.component.ts](ng2/src/app/time.component.ts)
 
 
 ## Modified source files
