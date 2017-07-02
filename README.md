@@ -88,6 +88,17 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to create a new Angular 2+ component.
   + How to use the component's lifecycle to implement a time view.
   + How to use then module [sprintf-js][npm-sprintf-js] to format strings.
+
+* [step6-login-form](../../blob/step6-login-form/README.md)
+  + How to create a login form with id and password.
+  + How to create an Angular 2+ service for user management.
+  + How to make a XML HTTP Request (XHR) in order to login a user.
+  + How to use a shared service in order to exchange data between two components.
+  + How to solve the cross origin problem when running separated servers.
+  + How to handle a Post request on server side.
+
+## Prerequisites
+
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
