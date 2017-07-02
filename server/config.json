@@ -3,5 +3,16 @@
     "name": "Max Mustermann",
     "mail": "max@mustermann.com"
   },
-  "morgan": "/tmp/morgan.log"
+  "morgan": "/tmp/morgan.log",
+  "debug": {
+    "colors" : true,
+    "wtimediff": 6,
+    "wlevel": 6,
+    "location": "::WARN",
+    "enabled": "*::INFO, *::WARN"
+  },
+  "logfile": {
+    "default": { "filename": "/tmp/webserver.log", "namespaces": "*::*", "locationNamespaces": "*" },
+    "warnings": { "filename": "/tmp/webserver-warnings.log", "namespaces": "*::WARN", "locationNamespaces": "-*" }
+  }
 }
