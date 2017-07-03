@@ -4,6 +4,9 @@ import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import {Subject} from 'rxjs/Rx';
 
+const serverUrl = 'http://localhost:8080';
+// const serverUrl = '';
+
 @Injectable()
 export class UserService {
 
@@ -18,7 +21,7 @@ export class UserService {
     return new Promise( (resolve, reject) => {
        const headers = new Headers({ 'Content-Type': 'application/json' });
        const options = new RequestOptions({ headers: headers });
-       this.http.post('http://localhost:8080/login', { htlid: htlid, password: password}, options).toPromise()
+       this.http.post(serverUrl + '/login', { htlid: htlid, password: password}, options).toPromise()
         .then( response => {
           this._user = (response.json() as IUser);
           this.user.next(this._user);

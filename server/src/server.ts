@@ -4,8 +4,7 @@ import * as path from 'path';
 import * as morgan from 'morgan';
 import * as nconf from 'nconf';
 import * as bodyParser from 'body-parser';
-
-const cors = require('cors');
+import * as cors from 'cors';
 
 // import of Node.js modules
 import * as net from 'net';
@@ -97,7 +96,9 @@ export class Server {
   private requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
     debug.info('%s %s from %s', req.method, req.url, clientSocket);
-    if (req.method === 'GET' && req.url === '/') {
+    if (req.method === 'GET' &&
+        (req.url === '/' || req.url === '/index.html' || req.url === '/login' ||
+         req.url.startsWith('/app')) ) {
       res.render('ngmain.pug');
     } else {
       next();
