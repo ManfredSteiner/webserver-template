@@ -3,8 +3,15 @@ import { UserService, IUser } from './services/user.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  template: `
+    <div *ngIf="!user" class="container">
+      <app-login></app-login>
+    </div>
+    <div *ngIf="user" class="container">
+      <router-outlet></router-outlet>
+    </div>
+  `,
+  styles: [  ]
 })
 export class AppComponent {
   public title = 'app';

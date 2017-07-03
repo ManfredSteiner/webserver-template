@@ -12,6 +12,9 @@ import * as net from 'net';
 import * as http from 'http';
 import * as fs from 'fs';
 
+// import modules of this project
+import { DbUser } from './dbUser';
+
 // logging with debug-sx/debug
 import * as debugsx from 'debug-sx';
 const debug: debugsx.IDefaultLogger = debugsx.createDefaultLogger('server');
@@ -113,11 +116,15 @@ export class Server {
   private handlePostLogin (req: express.Request, res: express.Response, next: express.NextFunction) {
     const data = req.body;
     if (!data || typeof(data.htlid) !== 'string' || typeof(data.password) !== 'string' ||
-        (data.htlid.length !== 2 && data.htlid.length !== 8) ) {
+        data.htlid.length < 2 || data.htlid.length > 8 ) {
       res.status(400).json({ 'error' : 'Missing or wrong parameters' });
       return;
     }
-    res.json({ htlid: data.htlid, firstname: 'Max', surname: 'Mustermann'});
+    if (!DbUser.Instance.verifiyPassword(data.htlid, data.password)) {
+      res.status(401).json({ 'error' : 'Wrong htlid or wrong password' });
+      return;
+    }
+    res.json(DbUser.Instance.getUser(data.htlid));
   }
 
   private error404Handler (req: express.Request, res: express.Response, next: express.NextFunction) {

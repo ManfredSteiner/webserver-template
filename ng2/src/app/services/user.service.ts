@@ -13,6 +13,15 @@ export class UserService {
   constructor (private http: Http) {
   }
 
+  public getLoginUser (): IUser {
+    return this._user;
+  }
+
+  public logout () {
+    this._user = undefined;
+    this.user.next(this._user);
+  }
+
   public login (htlid: string, password: string): Promise<IUser> {
     // return Promise.reject(new Error('not implemented yet'));
     return new Promise( (resolve, reject) => {

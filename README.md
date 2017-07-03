@@ -1,28 +1,26 @@
-# Creating and handling a login form
+# Login with session id and cookies
 
 ## Goals
 
 #### Client side (Node.js express)
 
-* How to create a login form with id and password.
-* How to create an Angular 2+ service for user management.
-* How to make a XML HTTP Request (XHR) in order to login a user.
-* How to use a shared service in order to exchange data between two components.
+* How to use the router module if user is logged in.
+* How to implement the logout.
+* How to show a flash message if login fails.
 
 #### Server side (Angular 2+ application)
 
-* How to solve the cross origin problem when running separated servers.
-* How to handle a Post request.
+* How to create a singleton for user management.
+* How to create and verify a password hash
 
 
 ## Prerequisites
 
-Install the module **[cors][npm-cors]** and **[body-parser][npm-body-parser]**
+Install the module **[jssha][npm-jssha]**.
 
 ```
 cd server
-npm install --save cors
-npm install --save body-parser @types/body-parser
+npm install --save jssha @types/jssha
 cd ..
 ```
 Make sure, that the Angular 2+ application bundles are available in subdirectory [ng2/dist](ng2/dist). Use the following command (or keyboard shortcut *CTRL + N* ) to build them:
@@ -44,34 +42,31 @@ Or you can start the Angular application via `ng serve`, and start the express s
 #### Modified source files
 
 * [server/src/server.ts](server/src/server.ts)
-* [server/src/views/ngmain.pug](server/src/views/ngmain.pug)
+
+#### New files
+
+* [server/src/db-user.ts](server/src/db-user.ts)
 
 ## Client side (Angular 2+ application)
 
 #### New files
 
-* [ng2/src/assets/logo.svg](ng2/src/assets/logo.svg)
-* [ng2/src/app/services/user.service.ts](ng2/src/app/services/user.service.ts)
-* [ng2/src/app/login.component.ts](ng2/src/app/login.component.ts)
+* [ng2/src/app/profil.component.ts](ng2/src/app/profil.component.ts)
+* [ng2/src/app/app-routing.module.ts](ng2/src/app/app-routing.module.ts)
 
 #### Modified source files
 
 * [ng2/src/app/app.component.ts](ng2/src/app/app.component.ts)
-* [ng2/src/app/app.component.html](ng2/src/app/app.component.html)
-* [ng2/src/app/app.component.css](ng2/src/app/app.component.css)
 * [ng2/src/app/app.module.ts](ng2/src/app/app.module.ts)
+* [ng2/src/app/services/user.service.ts](ng2/src/services/user.service.ts)
 
 
 ## Additional infos
 
-* [ Bootstrap CSS Forms][bootstrap-css-forms]
-* [Angular 2+ template driven forms][ng2-template-driven-forms]
-* [Angular 2+ HTTP Promise][ng2-http-promise]
-* [Angular 2+ Services][ng2-services]
+* [Bootstrap Alerts][bootstrap-alerts]
+* [Angular 2+ Routing & Navigation][ng2-routing]
 
 [npm-cors]: https://www.npmjs.com/package/cors
-[npm-body-parser]: https://www.npmjs.com/package/body-parser
-[bootstrap-css-forms]: http://getbootstrap.com/css/#forms
-[ng2-template-driven-forms]: https://angular.io/guide/form-validation#simple-template-driven-forms
-[ng2-http-promise]: https://angular.io/tutorial/toh-pt6#http-promise
-[ng2-services]: https://angular.io/guide/architecture#services
+[npm-jssha]: https://www.npmjs.com/package/jssha
+[bootstrap-alerts]: http://getbootstrap.com/components/#alerts
+[ng2-routing]: https://angular.io/guide/router
