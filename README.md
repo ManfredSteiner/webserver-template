@@ -97,6 +97,14 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to solve the cross origin problem when running separated servers.
   + How to handle a Post request on server side.
 
+* [step7-login-logout](../../blob/step7-login-logout/README.md)
+  + How to use the Angular 2+ router module if user is logged in.
+  + How to implement the logout.
+  + How to show a flash message if login fails.
+  + How to create a singleton for user management on server side.
+  + How to create and verify a password hash.
+
+
 ## Prerequisites
 
   
