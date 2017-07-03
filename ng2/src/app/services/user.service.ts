@@ -16,6 +16,10 @@ export class UserService {
   constructor (private http: Http) {
   }
 
+  public getServerUrl (): string {
+    return serverUrl;
+  }
+
   public getLoginUser (): IUser {
     return this._user;
   }

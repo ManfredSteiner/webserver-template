@@ -5,6 +5,10 @@ import * as morgan from 'morgan';
 import * as nconf from 'nconf';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
+import * as cookieParser from 'cookie-parser';
+import * as expressSession from 'express-session';
+import * as passport from 'passport';
+import { Strategy, IVerifyOptions, IStrategyOptionsWithRequest } from 'passport-local';
 
 // import of Node.js modules
 import * as net from 'net';
@@ -12,12 +16,23 @@ import * as http from 'http';
 import * as fs from 'fs';
 
 // import modules of this project
-import { DbUser } from './db-user';
+import { DbUser, IUser } from './db-user';
 
 // logging with debug-sx/debug
 import * as debugsx from 'debug-sx';
-const debug: debugsx.IDefaultLogger = debugsx.createDefaultLogger('server');
+const debug: debugsx.IFullLogger = debugsx.createFullLogger('server');
 
+// additional parameter req needed -> declaration wrong ?
+(<any>passport).serializeUser = function (user: IUser, req: any, done: (err: any, id?: string) => void) {
+  debug.fine('serializeUser(): user=%s', user && user.htlid);
+  done(null, user.htlid);
+};
+
+(<any>passport).deserializeUser = function (id: string, req: any, done: (err: any, user?: IUser) => void) {
+  debug.fine('deserializeUser(): id=%o', id);
+  const user = DbUser.Instance.getUser(id);
+  done(null, user);
+};
 
 export class Server {
   private _app: express.Application;
@@ -40,6 +55,17 @@ export class Server {
       console.log('Error: missing config admin');
       process.exit(1);
     }
+    const sessionConfig = {
+      secret: 'keyboard cat',
+      resave: true,
+      saveUninitialized: true
+    };
+    const strategyOptions: IStrategyOptionsWithRequest = {
+       passReqToCallback: true,
+       usernameField: 'htlid',
+       passwordField: 'password'
+    };
+    passport.use('login', new Strategy(strategyOptions, this.verifyPassword.bind(this)));
 
     this._app = express();
     this._app.set('views', path.join(__dirname, '/views'));
@@ -57,8 +83,16 @@ export class Server {
     this._app.use('/assets', express.static(path.join(__dirname, '../../ng2/dist/assets')));
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(bodyParser.json());
+
+    this._app.use(cookieParser());
+    this._app.use(expressSession(sessionConfig));
+    this._app.use(passport.initialize());
+    this._app.use(passport.session());
+
     this._app.post('/login', this.handlePostLogin.bind(this));
     this._app.post('/logout', this.handlePostLogout.bind(this));
+    this._app.use(this.handleAuthenticatedRequest.bind(this));
+    this._app.get('/data/*', this.handleGetData.bind(this));
     this._app.use(this.error404Handler.bind(this));
     this._app.use(this.errorHandler.bind(this));
   }
@@ -80,9 +114,9 @@ export class Server {
 
       this._server.on('connection', socket => {
         const clientSocket = socket.remoteAddress + ':' + socket.remotePort;
-        debug.fine('socket %s connected', clientSocket);
+        debug.finer('socket %s connected', clientSocket);
         socket.on('close', () => {
-          debug.fine('socket %s closed', clientSocket);
+          debug.finer('socket %s closed', clientSocket);
         });
       });
 
@@ -95,7 +129,6 @@ export class Server {
       });
     });
   }
-
 
   private requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
@@ -122,19 +155,55 @@ export class Server {
       res.status(400).json({ 'error' : 'Missing or wrong parameters' });
       return;
     }
-    debugger;
-    if (!DbUser.Instance.verifiyPassword(data.htlid, data.password)) {
+    if (req.user) {
+      // in case of request has a valid cookie
+      debug.fine('handlePostLogin(): removing user %s from request', req.user && req.user.htlid);
+      delete req.user;
+    }
+    debug.fine('handlePostLogin(): ----> passport.authenticate()');
+    const f = passport.authenticate('login', this.passportAuthenticate);
+    f.call(this, req, res, next);
+    debug.fine('handlePostLogin(): <--- passport.authenticate()');
+    if (req.user) {
+      const u = Object.assign({}, req.user);
+      delete u.passwordHash;
+      debug.info('User %s: login succeeded', u.htlid);
+      res.json(u);
+    } else {
       debug.warn('User %s: Login fails', data.htlid);
       res.status(401).json({ 'error' : 'Wrong htlid or wrong password' });
-      return;
     }
-    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
-    const user = DbUser.Instance.login(data.htlid, socket);
-    const u = Object.assign({}, user);
-    delete u.passwordHash;
-    debug.info('User %s: login succeeded', u.htlid);
-    res.json(u);
   }
+
+
+  private verifyPassword (req: express.Request, username: string, password: string,
+                          done: (error: any, user?: any, info?: any) => void) {
+    if (DbUser.Instance.verifiyPassword(username, password)) {
+      const user = DbUser.Instance.getUser(username);
+      if (user) {
+        debug.fine('verifyPassword(): ----> done() (user %s ok)', username);
+        done(null, user, req);
+        return;
+      }
+    }
+    debug.warn('verifyPassword(): ----> done() (user verification fails)');
+    done(null, false);
+  }
+
+
+  private passportAuthenticate (err: any, user: any, req: any) {
+    if (!err && user && req && typeof req.login === 'function') {
+      debug.fine('passportAuthenticate(): ---> req.login()');
+      req.login(user, (error: any) => {
+         debug.fine('passportAuthenticate(): <---- req.login()');
+      });
+    } else if (err) {
+      debug.warn(err);
+    } else {
+      debug.fine('passportAuthenticate(): no login possible');
+    }
+  }
+
 
   private handlePostLogout (req: express.Request, res: express.Response, next: express.NextFunction) {
     const data = req.body;
@@ -146,6 +215,28 @@ export class Server {
     const user = DbUser.Instance.logout(data.htlid, socket);
     debug.info('User %s: logout succeeded', user.htlid);
     res.json({ message: 'User ' + data.htlid + ' logged out'});
+  }
+
+
+  private handleAuthenticatedRequest (req: express.Request, res: express.Response, next: express.NextFunction) {
+    if (!req.user) {
+      debug.warn('request %s %s not authenticated', req.method, req.originalUrl);
+      res.status(401).json({ error: 'Not authenticated'});
+      return;
+    }
+    next();
+  }
+
+
+  private handleGetData (req: express.Request, res: express.Response, next: express.NextFunction) {
+    debug.fine('handleGetData()');
+    if (req.url === '/data/time') {
+      const value = { time: new Date().toISOString() };
+      debug.fine('send response: %o', value)
+      res.json(value);
+      return;
+    }
+    next();
   }
 
 

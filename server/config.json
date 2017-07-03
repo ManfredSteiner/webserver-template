@@ -9,7 +9,7 @@
     "wtimediff": 6,
     "wlevel": 6,
     "location": "::WARN",
-    "enabled": "*::INFO, *::WARN"
+    "enabled": "*::INFO, *::WARN, server::FINE"
   },
   "logfile": {
     "default": { "filename": "/tmp/webserver.log", "namespaces": "*::*", "locationNamespaces": "*" },
