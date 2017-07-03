@@ -13,7 +13,7 @@ import * as http from 'http';
 import * as fs from 'fs';
 
 // import modules of this project
-import { DbUser } from './dbUser';
+import { DbUser } from './db-user';
 
 // logging with debug-sx/debug
 import * as debugsx from 'debug-sx';

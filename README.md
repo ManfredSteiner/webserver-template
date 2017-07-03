@@ -1,4 +1,4 @@
-# Login with session id and cookies
+# Login and Logout
 
 ## Goals
 
@@ -58,7 +58,7 @@ Or you can start the Angular application via `ng serve`, and start the express s
 
 * [ng2/src/app/app.component.ts](ng2/src/app/app.component.ts)
 * [ng2/src/app/app.module.ts](ng2/src/app/app.module.ts)
-* [ng2/src/app/services/user.service.ts](ng2/src/services/user.service.ts)
+* [ng2/src/app/services/user.service.ts](ng2/src/app/services/user.service.ts)
 
 
 ## Additional infos
