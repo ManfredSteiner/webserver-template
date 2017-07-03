@@ -81,6 +81,28 @@ export class DbUser {
     return undefined;
   }
 
+
+  public login (htlid: string, socket: string): IUser {
+    const user = this.getUser(htlid);
+    if (!user) {
+      return undefined;
+    }
+    user.login = { at: Date.now(), socket: socket };
+    user.logout = undefined;
+    return user;
+  }
+
+
+  public logout (htlid: string, socket: string): IUser {
+    const user = this.getUser(htlid);
+    if (!user) {
+      return undefined;
+    }
+    user.login = undefined;
+    user.logout = { at: Date.now(), socket: socket };
+    return user;
+  }
+
 }
 
 export interface IUser {
@@ -88,4 +110,6 @@ export interface IUser {
   surname: string;
   firstname: string;
   passwordHash: string;
+  login?: { at: number, socket: string };
+  logout?: { at: number, socket: string };
 }

@@ -5,9 +5,9 @@ import { LoginComponent } from './login.component';
 import { ProfilComponent } from './profil.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/ng2/profil', pathMatch: 'full' }
-  , { path: 'ng2/profil',  component: ProfilComponent }
-  , { path: '**', redirectTo: '/ng2/profil', pathMatch: 'full' }
+  { path: '', redirectTo: '/app/profil', pathMatch: 'full' }
+  , { path: 'app/profil',  component: ProfilComponent }
+  , { path: '**', redirectTo: '/app/profil', pathMatch: 'full' }
 ];
 
 @NgModule({

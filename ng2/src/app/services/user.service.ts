@@ -4,6 +4,9 @@ import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import {Subject} from 'rxjs/Rx';
 
+const serverUrl = 'http://localhost:8080';
+// const serverUrl = '';
+
 @Injectable()
 export class UserService {
 
@@ -17,17 +20,34 @@ export class UserService {
     return this._user;
   }
 
-  public logout () {
+  public logout (): Promise<void> {
+    const htlid = this._user.htlid;
     this._user = undefined;
     this.user.next(this._user);
+    if (!htlid) {
+      return Promise.reject(new Error('No user logged in'));
+    } else {
+      return new Promise<void>( (resolve, reject) => {
+        const headers = new Headers({ 'Content-Type': 'application/json' });
+        const options = new RequestOptions({ headers: headers });
+        this.http.post(serverUrl + '/logout', { htlid: htlid }, options).toPromise()
+          .then( response => {
+            resolve();
+          })
+          .catch ( error =>  {
+            console.log(error);
+            reject(new Error('logout of ' + htlid + ' fails'));
+          });
+      });
+    }
   }
 
   public login (htlid: string, password: string): Promise<IUser> {
     // return Promise.reject(new Error('not implemented yet'));
-    return new Promise( (resolve, reject) => {
+    return new Promise<IUser>( (resolve, reject) => {
        const headers = new Headers({ 'Content-Type': 'application/json' });
        const options = new RequestOptions({ headers: headers });
-       this.http.post('http://localhost:8080/login', { htlid: htlid, password: password}, options).toPromise()
+       this.http.post(serverUrl + '/login', { htlid: htlid, password: password}, options).toPromise()
         .then( response => {
           this._user = (response.json() as IUser);
           this.user.next(this._user);

@@ -4,8 +4,7 @@ import * as path from 'path';
 import * as morgan from 'morgan';
 import * as nconf from 'nconf';
 import * as bodyParser from 'body-parser';
-
-const cors = require('cors');
+import * as cors from 'cors';
 
 // import of Node.js modules
 import * as net from 'net';
@@ -59,6 +58,7 @@ export class Server {
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(bodyParser.json());
     this._app.post('/login', this.handlePostLogin.bind(this));
+    this._app.post('/logout', this.handlePostLogout.bind(this));
     this._app.use(this.error404Handler.bind(this));
     this._app.use(this.errorHandler.bind(this));
   }
@@ -100,7 +100,9 @@ export class Server {
   private requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
     debug.info('%s %s from %s', req.method, req.url, clientSocket);
-    if (req.method === 'GET' && req.url === '/') {
+    if (req.method === 'GET' &&
+        (req.url === '/' || req.url === '/index.html' || req.url === '/login' ||
+         req.url.startsWith('/app')) ) {
       res.render('ngmain.pug');
     } else {
       next();
@@ -120,12 +122,32 @@ export class Server {
       res.status(400).json({ 'error' : 'Missing or wrong parameters' });
       return;
     }
+    debugger;
     if (!DbUser.Instance.verifiyPassword(data.htlid, data.password)) {
+      debug.warn('User %s: Login fails', data.htlid);
       res.status(401).json({ 'error' : 'Wrong htlid or wrong password' });
       return;
     }
-    res.json(DbUser.Instance.getUser(data.htlid));
+    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    const user = DbUser.Instance.login(data.htlid, socket);
+    const u = Object.assign({}, user);
+    delete u.passwordHash;
+    debug.info('User %s: login succeeded', u.htlid);
+    res.json(u);
   }
+
+  private handlePostLogout (req: express.Request, res: express.Response, next: express.NextFunction) {
+    const data = req.body;
+    if (!data || typeof(data.htlid) !== 'string') {
+      res.status(400).json({ 'error' : 'Missing or wrong parameters' });
+      return;
+    }
+    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    const user = DbUser.Instance.logout(data.htlid, socket);
+    debug.info('User %s: logout succeeded', user.htlid);
+    res.json({ message: 'User ' + data.htlid + ' logged out'});
+  }
+
 
   private error404Handler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;

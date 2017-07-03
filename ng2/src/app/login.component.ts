@@ -62,6 +62,7 @@ export class LoginComponent {
     this.userService.login(this.htlid, this.password)
       .then( user => {
         console.log('Login succeeded');
+        console.log(user);
       })
       .catch( err => {
         this.errorMessage = 'Login fails';
