@@ -104,6 +104,10 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to create a singleton for user management on server side.
   + How to create and verify a password hash.
 
+* [step8a-sessions-with-cookies](../../blob/step8a-sessions-with-cookies/README.md)
+  + How to get restricted data after as user after login (client-side)
+  + How to implement cookie based sessions on express-server (server-side).
+  + How to restrict data access, depending on if user is verified (server-side).
 
 ## Prerequisites
 
