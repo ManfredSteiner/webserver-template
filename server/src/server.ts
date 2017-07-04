@@ -122,7 +122,6 @@ export class Server {
       res.status(400).json({ 'error' : 'Missing or wrong parameters' });
       return;
     }
-    debugger;
     if (!DbUser.Instance.verifiyPassword(data.htlid, data.password)) {
       debug.warn('User %s: Login fails', data.htlid);
       res.status(401).json({ 'error' : 'Wrong htlid or wrong password' });

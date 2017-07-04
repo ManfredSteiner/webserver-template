@@ -54,6 +54,7 @@ export class UserService {
           resolve(response.json() as IUser);
         })
       .catch( error => {
+        this._user = undefined;
         console.log(error);
         let errMsg = '?';
         if (error instanceof Response) {
