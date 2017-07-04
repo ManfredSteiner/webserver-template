@@ -1,28 +1,42 @@
-# Login and Logout
+# JSON Web Token
 
 ## Goals
 
-#### Client side (Node.js express)
+#### Server side (Node.js express)
 
-* How to use the router module if user is logged in.
-* How to implement the logout.
-* How to show a flash message if login fails.
+* 
+* 
+* 
 
-#### Server side (Angular 2+ application)
+#### Client side (Angular 2+ application)
 
-* How to create a singleton for user management.
-* How to create and verify a password hash
+* 
+* 
 
 
 ## Prerequisites
 
-Install the module **[jssha][npm-jssha]**.
+Install the module **[jsonwebtoken][npm-jsonwebtoken]** and **[express-jwt][npm-express-jwt]**.
 
 ```
 cd server
-npm install --save jssha @types/jssha
+npm install --save jsonwebtoken @types/jsonwebtoken
+npm install --save express-jwt @types/express-jwt
 cd ..
 ```
+
+Create a key pair for creating and verifiying web tokens in subdirectory [server/keys](server/keys). Insert the filenames in the configuration (attribute `auth` in file [server/config.json](server/config.json)).
+
+```
+cd server
+mkdir keys
+openssl genrsa -out keys/server-private.pem
+openssl rsa -in keys/server-private.pem -pubout -out keys/server-public.pem
+cd ..
+```
+
+
+
 Make sure, that the Angular 2+ application bundles are available in subdirectory [ng2/dist](ng2/dist). Use the following command (or keyboard shortcut *CTRL + N* ) to build them:
 
 ```
@@ -36,6 +50,13 @@ cd ..
 You can start the express server to handle all client requests (Angular application and login POST request).
 
 Or you can start the Angular application via `ng serve`, and start the express server as for handling the POST request. In that case the module [cors][npm-cors] must be enabled as express middleware, otherwise the request will fail.
+
+You can verify token functionality with tool **curl**:
+
+```
+curl -i -X POST -H 'Content-Type: application/json' -d '{ "htlid": "sx", "password": "geheim" }' localhost:8080/auth
+
+```
 
 ## Server side (Node.js express)
 
@@ -63,10 +84,10 @@ Or you can start the Angular application via `ng serve`, and start the express s
 
 ## Additional infos
 
-* [Bootstrap Alerts][bootstrap-alerts]
-* [Angular 2+ Routing & Navigation][ng2-routing]
+* [Token based authentication][hyphe-blog-toke-based-auth]
+
 
 [npm-cors]: https://www.npmjs.com/package/cors
-[npm-jssha]: https://www.npmjs.com/package/jssha
-[bootstrap-alerts]: http://getbootstrap.com/components/#alerts
-[ng2-routing]: https://angular.io/guide/router
+[npm-jsonwebtoken]: https://www.npmjs.com/package/jsonwebtoken
+[npm-express-jwt]: https://www.npmjs.com/package/express-jwt
+[hyphe-blog-toke-based-auth]: https://blog.hyphe.me/token-based-authentication-with-node/

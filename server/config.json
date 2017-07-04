@@ -3,13 +3,18 @@
     "name": "Max Mustermann",
     "mail": "max@mustermann.com"
   },
+  "auth": {
+    "privatekey": "keys/server-private.pem",
+    "publickey": "keys/server-public.pem",
+    "authorization_uri": "https://localhost:8080/auth"
+  },
   "morgan": "/tmp/morgan.log",
   "debug": {
     "colors" : true,
     "wtimediff": 6,
     "wlevel": 6,
     "location": "::WARN",
-    "enabled": "*::INFO, *::WARN"
+    "enabled": "*::INFO, *::WARN, server::FINE, auth::FINE"
   },
   "logfile": {
     "default": { "filename": "/tmp/webserver.log", "namespaces": "*::*", "locationNamespaces": "*" },
