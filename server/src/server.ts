@@ -114,7 +114,7 @@ export class Server {
   private handlePostLogin (req: express.Request, res: express.Response, next: express.NextFunction) {
     const data = req.body;
     if (!data || typeof(data.htlid) !== 'string' || typeof(data.password) !== 'string' ||
-        (data.htlid.length !== 2 && data.htlid.length !== 8) ) {
+         data.htlid.length < 2 || data.htlid.length > 8 ) {
       res.status(400).json({ 'error' : 'Missing or wrong parameters' });
       return;
     }

@@ -11,7 +11,8 @@ import { UserService } from './services/user.service';
       <form class="form-signin" #loginForm="ngForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label class="sr-only" for="inputHtlid">HTL-ID</label>
-          <input class="form-control" type="text" placeholder="HTL-ID" required minlength="2" maxlength="24"
+          <input class="form-control" type="text" placeholder="HTL-ID"
+                 required minlength="2" maxlength="24"
                  name="htlid" #name="ngModel" [(ngModel)]="htlid"/>
         </div>
         <div class="form-group">
