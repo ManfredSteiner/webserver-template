@@ -66,11 +66,10 @@ export class Server {
     this._app.use(Auth.expressMiddleware);
     this._app.post('/auth', Auth.expressMiddlewareAuthenticate, this.handleAuth.bind(this));
     this._app.use(bodyParser.urlencoded({ extended: true }) );
-    this._app.post('/login', this.handleLogin.bind(this));
     this._app.use(Auth.expressMiddleWareCheckToken);
+    this._app.use(this.handleAuthenticatedRequest.bind(this));
     this._app.use('/logout', this.handleLogout.bind(this));
 
-    this._app.use(this.handleAuthenticatedRequest.bind(this));
     this._app.get('/data/*', this.handleGetData.bind(this));
     this._app.use(this.error404Handler.bind(this));
     this._app.use(this.errorHandler.bind(this));
@@ -139,38 +138,6 @@ export class Server {
     res.json({ htlid: req.user.htlid, token: req.token });
   }
 
-  private handleLogin (req: express.Request, res: express.Response, next: express.NextFunction) {
-    // const data = req.body;
-    // if (!data || typeof(data.htlid) !== 'string' || typeof(data.password) !== 'string' ||
-    //     data.htlid.length < 2 || data.htlid.length > 8 ) {
-    //   res.status(400).json({ 'error' : 'Missing or wrong parameters' });
-    //   return;
-    // }
-    // if (!DbUser.Instance.verifiyPassword(data.htlid, data.password)) {
-    //   debug.warn('User %s: Login fails', data.htlid);
-    //   res.status(401).json({ 'error' : 'Wrong htlid or wrong password' });
-    //   return;
-    // }
-    // const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
-    // const user = DbUser.Instance.login(data.htlid, socket);
-    // const u: IUser = Object.assign({}, user);
-    // delete u.passwordHash;
-    // debug.info('User %s: login succeeded', u.htlid);
-    // res.json(u);
-    throw new Error('not implemented yet');
-  }
-
-  private handleLogout (req: express.Request, res: express.Response, next: express.NextFunction) {
-    const data = req.body;
-    if (!data || typeof(data.htlid) !== 'string') {
-      res.status(400).json({ 'error' : 'Missing or wrong parameters' });
-      return;
-    }
-    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
-    const user = DbUser.Instance.logout(data.htlid, socket);
-    debug.info('User %s: logout succeeded', user.htlid);
-    res.json({ message: 'User ' + data.htlid + ' logged out'});
-  }
 
   private handleAuthenticatedRequest (req: express.Request, res: express.Response, next: express.NextFunction) {
     if (!req.user || !req.user.model || !(req.user.model instanceof User)) {
@@ -180,6 +147,21 @@ export class Server {
     }
     next();
   }
+
+
+  private handleLogout (req: express.Request, res: express.Response, next: express.NextFunction) {
+    const user = req.user && req.user.model;
+    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    const u = DbUser.Instance.logout(user.htlid, socket);
+    if (u instanceof User) {
+      debug.info('User %s: logout succeeded', user.htlid);
+      res.json({ message: 'User ' + user.htlid + ' logged out'});
+    } else {
+      debug.info('User %s: already logged out', user.htlid);
+      res.json({ message: 'User ' + user.htlid + ' already logged out'});
+    }
+  }
+
 
   private handleGetData (req: IRequestWithUser, res: express.Response, next: express.NextFunction) {
     debug.fine('handleGetData()');

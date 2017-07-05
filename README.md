@@ -4,14 +4,13 @@
 
 #### Server side (Node.js express)
 
-* 
-* 
-* 
+* How to create and verify access tokens.
+* How to handle restriced data resources.
 
 #### Client side (Angular 2+ application)
 
-* 
-* 
+* How to login and logut the user using an access-token.
+* How to get restriced data from server (server time).
 
 
 ## Prerequisites
@@ -25,7 +24,7 @@ npm install --save express-jwt @types/express-jwt
 cd ..
 ```
 
-Create a key pair for creating and verifiying web tokens in subdirectory [server/keys](server/keys). Insert the filenames in the configuration (attribute `auth` in file [server/config.json](server/config.json)).
+Key pairs are already available in this branch (subdirectory [server/keys](server/keys)). But you can also create your own key pair:. Replace afterwards the filenames in the configuration file (attribute `auth` in file [server/config.json](server/config.json)).
 
 ```
 cd server
@@ -34,7 +33,6 @@ openssl genrsa -out keys/server-private.pem
 openssl rsa -in keys/server-private.pem -pubout -out keys/server-public.pem
 cd ..
 ```
-
 
 
 Make sure, that the Angular 2+ application bundles are available in subdirectory [ng2/dist](ng2/dist). Use the following command (or keyboard shortcut *CTRL + N* ) to build them:
@@ -53,9 +51,14 @@ Or you can start the Angular application via `ng serve`, and start the express s
 
 You can verify token functionality with tool **curl**:
 
+Get a new access token with:
 ```
 curl -i -X POST -H 'Content-Type: application/json' -d '{ "htlid": "sx", "password": "geheim" }' localhost:8080/auth
 
+```
+Check access to restricted data with ... (replace <token> with the token you get with the previous step):
+```
+curl -H 'Authorization: Bearer <token>' localhost:8080/data/time
 ```
 
 ## Server side (Node.js express)
@@ -66,21 +69,19 @@ curl -i -X POST -H 'Content-Type: application/json' -d '{ "htlid": "sx", "passwo
 
 #### New files
 
+* [server/src/user.ts](server/src/user.ts)
 * [server/src/db-user.ts](server/src/db-user.ts)
+* [server/src/auth.ts](server/src/auth.ts)
 
 ## Client side (Angular 2+ application)
 
-#### New files
-
-* [ng2/src/app/profil.component.ts](ng2/src/app/profil.component.ts)
-* [ng2/src/app/app-routing.module.ts](ng2/src/app/app-routing.module.ts)
 
 #### Modified source files
 
+* [ng2/src/app/profil.component.ts](ng2/src/app/profil.component.ts)
 * [ng2/src/app/app.component.ts](ng2/src/app/app.component.ts)
 * [ng2/src/app/app.module.ts](ng2/src/app/app.module.ts)
 * [ng2/src/app/services/user.service.ts](ng2/src/app/services/user.service.ts)
-
 
 ## Additional infos
 

@@ -27,22 +27,31 @@ export class UserService {
   }
 
   public logout (): Promise<void> {
-    const htlid = this._user.htlid;
-    this._user = undefined;
-    this.user.next(this._user);
-    if (!htlid) {
+    if (!this._user || !this._user.htlid) {
       return Promise.reject(new Error('No user logged in'));
     } else {
       return new Promise<void>( (resolve, reject) => {
-        const headers = new Headers({ 'Content-Type': 'application/json' });
+        const headers = new Headers({
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + this._authResponse.token
+        });
         const options = new RequestOptions({ headers: headers });
-        this.http.post(serverUrl + '/logout', { htlid: htlid }, options).toPromise()
+        // using POST because this request should not be in browsers history
+        this.http.post(serverUrl + '/logout', {}, options).toPromise()
           .then( response => {
-            resolve();
+            if (response.status !== 200) {
+              console.log(response);
+              reject(new Error('Logout fails'));
+            } else {
+              this._user = undefined;
+              this._authResponse = undefined;
+              this.user.next(undefined)            ;
+              resolve();
+            }
           })
           .catch ( error =>  {
             console.log(error);
-            reject(new Error('logout of ' + htlid + ' fails'));
+            reject(new Error('logout of ' + this._user.htlid + ' fails'));
           });
       });
     }
@@ -62,6 +71,9 @@ export class UserService {
     reject(new Error('login() fails (' + errMsg + ')'));
   }
 
+  public getAccessToken (): string {
+    return this._authResponse && this._authResponse.token;
+  }
 
   public login (htlid: string, password: string): Promise<IUser> {
     // return Promise.reject(new Error('not implemented yet'));
