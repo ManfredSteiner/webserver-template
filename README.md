@@ -109,7 +109,11 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to implement cookie based sessions on express-server (server-side).
   + How to restrict data access, depending on if user is verified (server-side).
 
-## Prerequisites
+* [step8b-json-web-token](../../blob/step8b-json-web-token/README.md)
+  + How to create and verify access tokens.
+  + How to implement restriced data resources.
+  + How to login and logut the user using an access-token.
+
 
   
 [nodejs]: https://nodejs.org/en/
@@ -123,4 +127,4 @@ Use command `git checkout <branch>` to get one of the following branches:
 [npm-debug-sx]: https://www.npmjs.com/package/debug-sx
 [bootstrap-css]: http://getbootstrap.com/css/
 [npm-sprintf-js]: https://www.npmjs.com/package/sprintf-js
-
+[npm-spin]: https://www.npmjs.com/package/spin
