@@ -46,6 +46,7 @@ export class Server {
     this._app.use(express.static(path.join(__dirname, 'public')));
     this._app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
     this._app.use('/ng2', express.static(path.join(__dirname, '../../ng2/dist')));
+    this._app.use('/assets', express.static(path.join(__dirname, '../../ng2/dist/assets')));
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(this.error404Handler.bind(this));
     this._app.use(this.errorHandler.bind(this));
