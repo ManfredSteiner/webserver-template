@@ -11,8 +11,8 @@ import { Strategy, IVerifyOptions, IStrategyOptionsWithRequest } from 'passport-
 import * as fs from 'fs';
 
 // import modules of this project
-import { DbUser } from './db-user';
-import { User } from './user';
+import { DbUser } from './db/db-user';
+import { User } from './db/schemas/user';
 
 import * as debugsx from 'debug-sx';
 const debug: debugsx.IFullLogger = debugsx.createFullLogger('auth');
@@ -110,7 +110,7 @@ export class Auth {
   private deserialize (req: express.Request, res: express.Response, next: express.NextFunction) {
     debug.fine('deserialize()');
     if (req.user.htlid) {
-      req.user.model = dbUser.getUser(req.user.htlid);
+      req.user.model = dbUser.getCachedUser(req.user.htlid);
     }
     next();
   }
@@ -137,7 +137,7 @@ class MyPassport {
 
   public verify (req: express.Request, username: string, password: string,
                  done: (error: any, user?: any, options?: IVerifyOptions) => void) {
-    const user = dbUser.getUser(username);
+    const user = dbUser.getCachedUser(username);
     const htlid = username;
     if (! (user instanceof User)) {
       debug.warn('unknown user %s', htlid);

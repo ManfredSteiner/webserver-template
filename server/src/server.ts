@@ -12,8 +12,8 @@ import * as http from 'http';
 import * as fs from 'fs';
 
 // import modules of this project
-import { DbUser } from './db-user';
-import { User, IUser } from './user';
+import { DbUser } from './db/db-user';
+import { User, IUser } from './db/schemas/user';
 import { Auth, DbAuthError } from './auth';
 
 // logging with debug-sx/debug
