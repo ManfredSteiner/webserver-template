@@ -14,12 +14,12 @@ export class Journal {
 
   constructor(name: string) {
     this._name = name;
-    this._save   = debugsx('journal:' + name + 's::SAV');
-    this._remove = debugsx('journal:' + name + 's::DEL');
-    this._err    = debugsx('journal:' + name + 's::ERR');
-    this._done   = debugsx('journal:' + name + 's::DONE');
-    this._create = debugsx('journal:' + name + 's::INS');
+    this._create = debugsx('journal:' + name + 's::NEW');
     this._set    = debugsx('journal:' + name + 's::SET');
+    this._save   = debugsx('journal:' + name + 's::SAVE');
+    this._done   = debugsx('journal:' + name + 's::DONE');
+    this._err    = debugsx('journal:' + name + 's::ERR');
+    this._remove = debugsx('journal:' + name + 's::DEL');
   }
 
   public get save (): debug.IDebugger {

@@ -12,7 +12,7 @@ import * as fs from 'fs';
 
 // import modules of this project
 import { DbUser } from './db/db-user';
-import { User } from './db/schemas/user';
+import { User } from './db/documents/user';
 
 import * as debugsx from 'debug-sx';
 const debug: debugsx.IFullLogger = debugsx.createFullLogger('auth');

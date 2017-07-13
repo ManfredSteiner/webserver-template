@@ -12,28 +12,50 @@ export abstract class Document<T> {
   public abstract toObject(): T;
   public abstract save (): Promise<boolean>;
 
+
   protected journalSet (attributeName: string, oldValue: any, newValue: any) {
-    if (this._journal && this._journal.save.enabled) {
-      this._journal.set('id=%s, %s: %s -> %s', this.id, attributeName, oldValue, newValue);
+    if (this._journal && this._journal.set.enabled) {
+      if (typeof(oldValue) === 'object' || typeof(newValue) === 'object') {
+        this._journal.set('%s, %s: %o -> %o', this.defaultJournalPrefix(), attributeName, oldValue, newValue);
+      } else {
+        this._journal.set('%s, %s: %s -> %s', this.defaultJournalPrefix(), attributeName, oldValue, newValue);
+      }
     }
   }
 
-  protected journalSave () {
+  protected journalSave (savedAt?: number) {
     if (this._journal && this._journal.save.enabled) {
-      this._journal.save('id=%s', this.id);
+      if (savedAt) {
+        this._journal.save('%s: savedAt=%s', this.defaultJournalPrefix(), savedAt);
+      } else {
+        this._journal.save('%s', this.defaultJournalPrefix());
+      }
     }
   }
 
-  protected journalDone () {
+  protected journalDone (savedAt?: number, prefix?: string) {
     if (this._journal && this._journal.done.enabled) {
-      this._journal.done('id=%s', this.id);
+      if (savedAt) {
+        this._journal.done('%s: savedAt=%s', this.defaultJournalPrefix(), savedAt);
+      } else {
+        this._journal.done('%s', this.defaultJournalPrefix());
+      }
     }
   }
 
-  protected journalErr (err: any) {
+  protected journalErr (err: any, savedAt?: number, prefix?: string) {
     if (this._journal && this._journal.err.enabled) {
-      this._journal.err('id=%s\n%e', this.id, err);
+      if (savedAt) {
+        this._journal.err('%s: savedAt=%s\n%e', this.defaultJournalPrefix(), savedAt, err);
+      } else {
+        this._journal.err('%s\n%e', this.defaultJournalPrefix(), err);
+      }
     }
   }
+
+  protected defaultJournalPrefix (): string {
+    return 'id=' + this.id;
+  }
+
 
 }

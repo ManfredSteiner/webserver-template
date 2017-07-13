@@ -62,16 +62,20 @@ Dbms.openDatabase('webserver').then( db => {
     const cachedUsers = dbUser.getCachedDocuments();
     const user = cachedUsers['sx'];
     if (!user) {
-      debugger;
       dbUser.create({ htlid: 'sx', surname: 'Steiner'}).catch( err => debug.warn(err) );
-    } else {
-      debugger;
+    } else if (user.surname === 'Steiner') {
       user.surname = 'Goofies';
       user.save().then( saved => {
         debug.info('saved: %s', saved);
       }).catch( err => debug.warn(err) );
+    } else if (!user.login) {
+      user.login = { at: Date.now(), socket: '127.0.0.1:2000' };
+      user.save().catch( err => debug.warn(err) );
+    } else {
+      const c = user.login;
+      debug.info('%o', c);
     }
-  }).catch( err => { debug.warn(err); } );
+    }).catch( err => { debug.warn(err); } );
 
 }).catch( err => { debug.warn(err)} );
 

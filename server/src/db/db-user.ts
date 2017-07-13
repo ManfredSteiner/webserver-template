@@ -4,8 +4,8 @@ import { Database } from './database';
 import { MongooseDatabase } from './mongoose-database';
 import { MongooseCollection } from './mongoose-collection';
 import { Collection } from './collection';
-import { IUser, User } from './documents/user';
-import { IUserDocument, userSchema } from './schemas/user';
+import { User } from './documents/user';
+import { IUser, IUserDocument, userSchema } from './schemas/user-schema';
 
 export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
 
@@ -110,14 +110,11 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
   }
 
   protected preSave ( next: (err?: mongoose.NativeError) => void) {
-    debugger;
     if ((<any>this)._doc) {
       const doc = <IUserDocument>(<any>this)._doc;
       if (!doc.createdAt) {
         doc.createdAt = Date.now();
-        DbUser._instance._journal.create('htlid=%s: createdAt=%d\n%o', doc.htlid, doc.createdAt, doc);
-      } else {
-        DbUser._instance._journal.save('htlid=%s (id=%s): savedAt=%d', doc.htlid, doc._id, doc.savedAt);
+        // DbUser._instance._journal.create('htlid=%s: createdAt=%d\n%o', doc.htlid, doc.createdAt, doc);
       }
     }
     next();
