@@ -23,22 +23,32 @@ export abstract class Document<T> {
     }
   }
 
-  protected journalSave (savedAt?: number) {
+  protected journalSave (startedAt?: number) {
     if (this._journal && this._journal.save.enabled) {
-      if (savedAt) {
-        this._journal.save('%s: savedAt=%s', this.defaultJournalPrefix(), savedAt);
+      if (startedAt) {
+        this._journal.save('%s: startedAt=%s', this.defaultJournalPrefix(), startedAt);
       } else {
         this._journal.save('%s', this.defaultJournalPrefix());
       }
     }
   }
 
-  protected journalDone (savedAt?: number, prefix?: string) {
+  protected journalDone (startedAt?: number, prefix?: string) {
     if (this._journal && this._journal.done.enabled) {
-      if (savedAt) {
-        this._journal.done('%s: savedAt=%s', this.defaultJournalPrefix(), savedAt);
+      if (startedAt) {
+        this._journal.done('%s: startedAt=%s', this.defaultJournalPrefix(), startedAt);
       } else {
         this._journal.done('%s', this.defaultJournalPrefix());
+      }
+    }
+  }
+
+  protected journalDelete (startedAt?: number) {
+    if (this._journal && this._journal.set.enabled) {
+      if (startedAt) {
+        this._journal.delete('%s: startedAt=%s', this.defaultJournalPrefix(), startedAt);
+      } else {
+        this._journal.delete('%s', this.defaultJournalPrefix());
       }
     }
   }

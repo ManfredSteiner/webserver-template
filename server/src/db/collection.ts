@@ -13,6 +13,7 @@ export abstract class Collection<T, D extends Document<T>> {
   }
 
   public abstract create(item: T): Promise<D>;
+  public abstract delete(item: D): Promise<boolean>;
   public abstract findAll (): Promise<D[]>;
   public abstract find (conditions: Object): Promise<D []>;
 

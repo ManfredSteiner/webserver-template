@@ -1,3 +1,4 @@
+import * as mongodb from 'mongodb';
 import * as mongoose from 'mongoose';
 
 import * as debugsx from 'debug-sx';
@@ -6,7 +7,7 @@ import { Dbms } from './dbms';
 import { MongooseDatabase } from './mongoose-database';
 import { Document } from './document';
 import { Collection } from './collection';
-
+import { MongooseDocument } from './mogoose-document';
 
 
 export abstract class MongooseCollection<T, D extends Document<T>, MD extends mongoose.Document> extends Collection<T, D> {
@@ -51,7 +52,7 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
   }
 
 
-  public create(item: T): Promise<D> {
+  public create (item: T): Promise<D> {
     return new Promise<D>( (resolve, reject) => {
       this._model.create(item).then( (d) => {
         const document = this.createDocument(d);
@@ -61,6 +62,19 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
     });
   }
 
+
+  public delete(item: D): Promise<boolean> {
+    return new Promise<boolean>( (resolve, reject) => {
+      this._model.remove((<any>item)._document).then( res => {
+        const result: mongodb.DeleteWriteOpResultObject = <any>res;
+         if (result.result.ok && result.result.n === 1) {
+           resolve(true);
+         } else {
+           reject(new Error('unexpected response og mongodb'));
+         }
+      }).catch( err => reject(err) );
+    });
+  }
 
   public clearCache (): void {
     throw new Error('no cache implemented');

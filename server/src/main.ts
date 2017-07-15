@@ -64,6 +64,10 @@ Dbms.openDatabase('webserver').then( db => {
     if (!user) {
       dbUser.create({ htlid: 'sx', surname: 'Steiner'}).catch( err => debug.warn(err) );
     } else if (user.surname === 'Steiner') {
+      dbUser.delete(user).then( () => {
+        debug.info('user deleted');
+      }).catch( err => debug.warn(err) );
+    } else if (user.surname === 'Stony') {
       user.surname = 'Goofies';
       user.save().then( saved => {
         debug.info('saved: %s', saved);

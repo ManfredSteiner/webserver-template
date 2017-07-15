@@ -6,7 +6,7 @@ export class Journal {
 
   private _name: string;
   private _save:   debug.IDebugger;
-  private _remove: debug.IDebugger;
+  private _delete: debug.IDebugger;
   private _err:    debug.IDebugger;
   private _done:   debug.IDebugger;
   private _create: debug.IDebugger;
@@ -19,15 +19,15 @@ export class Journal {
     this._save   = debugsx('journal:' + name + 's::SAVE');
     this._done   = debugsx('journal:' + name + 's::DONE');
     this._err    = debugsx('journal:' + name + 's::ERR');
-    this._remove = debugsx('journal:' + name + 's::DEL');
+    this._delete = debugsx('journal:' + name + 's::DEL');
   }
 
   public get save (): debug.IDebugger {
     return this._save;
   }
 
-  public get remove (): debug.IDebugger {
-    return this._remove;
+  public get delete (): debug.IDebugger {
+    return this._delete;
   }
 
   public get err (): debug.IDebugger {

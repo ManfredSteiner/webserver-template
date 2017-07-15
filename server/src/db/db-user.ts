@@ -30,15 +30,8 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     return this._instance;
   }
 
-  public static create (user: IUser): Promise<User> {
-    return new Promise<User>( (resolve, reject) => {
-      const dbUser = DbUser.Instance;
-      // dbUser._model.create(user).then( (userDocument: IUserDocument) => {
-      //   resolve(new User(userDocument));
-      // }).catch ( (err) => {
-      //   reject(err);
-      // });
-    });
+  public static createUser (user: IUser): Promise<User> {
+    return this._instance.create(user);
   }
 
   // public static deleteUser (user: User): Promise<User> {
