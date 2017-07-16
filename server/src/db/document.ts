@@ -12,7 +12,6 @@ export abstract class Document<T> {
   public abstract toObject(): T;
   public abstract save (): Promise<boolean>;
 
-
   protected journalSet (attributeName: string, oldValue: any, newValue: any) {
     if (this._journal && this._journal.set.enabled) {
       if (typeof(oldValue) === 'object' || typeof(newValue) === 'object') {
@@ -39,16 +38,6 @@ export abstract class Document<T> {
         this._journal.done('%s: startedAt=%s', this.defaultJournalPrefix(), startedAt);
       } else {
         this._journal.done('%s', this.defaultJournalPrefix());
-      }
-    }
-  }
-
-  protected journalDelete (startedAt?: number) {
-    if (this._journal && this._journal.set.enabled) {
-      if (startedAt) {
-        this._journal.delete('%s: startedAt=%s', this.defaultJournalPrefix(), startedAt);
-      } else {
-        this._journal.delete('%s', this.defaultJournalPrefix());
       }
     }
   }

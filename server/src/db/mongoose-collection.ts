@@ -57,6 +57,7 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
       this._model.create(item).then( (d) => {
         const document = this.createDocument(d);
         this.journalCreate(document);
+        // document.journalCreate();
         resolve(document);
       }).catch( err => { reject(err); } );
     });
@@ -65,9 +66,13 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
 
   public delete(item: D): Promise<boolean> {
     return new Promise<boolean>( (resolve, reject) => {
+      const startedAt = Date.now();
+      this.journalDelete(item, startedAt);
       this._model.remove((<any>item)._document).then( res => {
         const result: mongodb.DeleteWriteOpResultObject = <any>res;
          if (result.result.ok && result.result.n === 1) {
+           this.journalDone(item, startedAt);
+           // item.journalDelete();
            resolve(true);
          } else {
            reject(new Error('unexpected response og mongodb'));
@@ -90,38 +95,6 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
 
   protected abstract createDocument (document: mongoose.Document): D;
 
-  // public findAll(): Promise<T[]> {
-  //   return new Promise<T[]>( (resolve, reject) =>  {
-  //     return this._model.find({}).then( items => {
-  //       for (const item of items) {
-  //         const id = item._id;
-  //         if (this._cache[id]) {
-  //           this._cache[id] = this.createDocument(item);
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
-
-  // protected update(_id: mongoose.Types.ObjectId, item: T, callback: (error: any, result: any) => void) {
-  //   this._model.update({ _id: _id }, item, callback);
-  // }
-
-  // protected delete(_id: string, callback: (error: any, result: any) => void) {
-  //   this._model.remove({ _id: this.toObjectId(_id) }, (err) => callback(err, null));
-  // }
-
-  // protected findById(_id: string, callback: (error: any, result: T) => void) {
-  //   this._model.findById(_id, callback);
-  // }
-
-  // protected findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.Query<T> {
-  //   return this._model.findOne(cond, callback);
-  // }
-
-  // protected find (cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]> {
-  //   return this._model.find(cond, options, callback);
-  // }
 
   protected preInit ( next: (err?: mongoose.NativeError) => void) { next(); }
   protected preValidate ( next: (err?: mongoose.NativeError) => void) { next(); }
