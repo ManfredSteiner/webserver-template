@@ -1,11 +1,12 @@
 import * as mongoose from 'mongoose';
 
 import { Database } from './database';
+import { Collection } from './collection';
 import { MongooseDatabase } from './mongoose-database';
 import { MongooseCollection } from './mongoose-collection';
-import { Collection } from './collection';
 import { User } from './documents/user';
 import { IUser, IUserDocument, userSchema } from './schemas/user-schema';
+
 
 export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
 
@@ -34,15 +35,13 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     return this._instance.create(user);
   }
 
-  // public static deleteUser (user: User): Promise<User> {
-  //   return DbUser.Instance._deleteUser(user);
-  // }
-
-  // public static getUserByHtlId (htlid: string): Promise<User> {
-  //   return DbUser.Instance._getUserByHtlId(htlid);
-  // }
+  public static deleteUser (user: User): Promise<boolean> {
+    return this._instance.delete(user);
+  }
 
   private static _instance: DbUser;
+
+  // **************************************************************************
 
   private _cache: { [ htlid: string ]: User };
 
@@ -82,13 +81,48 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     return this._cache;
   }
 
-  public login (htlid: string, socket: string) {
-
+  public login (htlid: string, socket: string): Promise<User> {
+    const cachedUser = this._cache[htlid];
+    return new Promise<User>( (resolve, reject) => {
+      const promise: Promise<User>  = cachedUser ? Promise.resolve(cachedUser) : this.findUserByHtlId(htlid);
+      promise.then( user => {
+        user.login = { at: Date.now(), socket: socket };
+        user.logout = undefined;
+        user.save().then ( saved => {
+          resolve(user);
+        }).catch( err => reject(err) );
+      });
+    });
   }
 
-  public logout (htlid: string, socket: string): User {
-    return undefined;
+  public logout (htlid: string, socket: string): Promise<User> {
+    const cachedUser = this._cache[htlid];
+    return new Promise<User>( (resolve, reject) => {
+      const promise: Promise<User>  = cachedUser ? Promise.resolve(cachedUser) : this.findUserByHtlId(htlid);
+      promise.then( user => {
+        user.logout = { at: Date.now(), socket: socket };
+        user.login = undefined;
+        user.save().then ( saved => {
+          resolve(user);
+        }).catch( err => reject(err) );
+      });
+    });
   }
+
+  public findByHtlid (htlid: string): Promise<User> {
+    return new Promise<User>( (resolve, reject) => {
+      super.find({ htlid: htlid}).then( users => {
+        if (!Array.isArray(users) || users.length < 1) {
+          resolve(undefined);
+        } else if (users.length > 1) {
+          reject(new Error('More than one user found with htlid ' + htlid));
+        } else {
+          resolve(users[0]);
+        }
+      }).catch( err => reject(err));
+    });
+  }
+
 
   protected createDocument (document: IUserDocument): User {
     const user = new User(document, this._journal);
@@ -96,10 +130,8 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     return user;
   }
 
-  protected journalCreate (document: User) {
-    if (this._journal.create.enabled) {
-      this._journal.create('htlid=%s\n%o', document.htlid, document.toObject());
-    }
+  protected defaultJournalPrefix (document: User): string {
+    return 'htlid=' + document.htlid;
   }
 
   protected preSave ( next: (err?: mongoose.NativeError) => void) {
@@ -107,40 +139,9 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
       const doc = <IUserDocument>(<any>this)._doc;
       if (!doc.createdAt) {
         doc.createdAt = Date.now();
-        // DbUser._instance._journal.create('htlid=%s: createdAt=%d\n%o', doc.htlid, doc.createdAt, doc);
       }
     }
     next();
   }
 
-  // private _getUserByHtlId (htlid: string): Promise<User> {
-  //   const user = this._userCache[htlid];
-  //   if (user) {
-  //     return Promise.resolve(user);
-  //   }
-  //   debugger;
-  //   return new Promise<User>( (resolve, reject) => {
-  //     debugger;
-  //     this._model.find({}, (err, users) => {
-  //       debugger;
-  //     });
-
-  //     this._model.find({ htlid: htlid }).then( (users: IUserDocument []) => {
-  //       debugger;
-  //       if (!Array.isArray(users)) {
-  //         reject(new Error('result not an array'));
-  //       } else if (users.length > 1) {
-  //         reject(new Error('more than one user with htlid ' + htlid));
-  //       } else if (users.length < 1) {
-  //         resolve(undefined); // user not found
-  //       } else {
-  //         const u = new User(users[0]);
-  //         this._userCache[htlid] = u;
-  //         resolve(u);
-  //       }
-  //     }).catch ( (err) => {
-  //       reject(err);
-  //     });
-  //   });
-  // };
 }

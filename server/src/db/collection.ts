@@ -18,7 +18,6 @@ export abstract class Collection<T, D extends Document<T>> {
   public abstract find (conditions: Object): Promise<D []>;
 
   public abstract clearCache (): void;
-  public abstract refreshCache (): Promise<{[ key: string]: D }>;
   public abstract getCachedDocuments (): { [ key: string]: D };
 
 
@@ -51,7 +50,7 @@ export abstract class Collection<T, D extends Document<T>> {
   protected journalErr (document: D, err: any, startedAt?: number) {
     if (this._journal && this._journal.err.enabled) {
       if (startedAt) {
-        this._journal.err('%s: savedAt=%s\n%e', this.defaultJournalPrefix(document), startedAt, err);
+        this._journal.err('%s: startedAt=%s\n%e', this.defaultJournalPrefix(document), startedAt, err);
       } else {
         this._journal.err('%s\n%e', this.defaultJournalPrefix(document), err);
       }

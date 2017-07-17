@@ -81,6 +81,10 @@ Dbms.openDatabase('webserver').then( db => {
     }
     }).catch( err => { debug.warn(err); } );
 
+  dbUser.findByHtlid('sx').then( user => {
+    debug.info('findbyHtlid %s: %o', 'sx', user && user.toObject());
+  }).catch(err => debug.warn(err));
+
 }).catch( err => { debug.warn(err)} );
 
 // import modules of this project after logger configuration
