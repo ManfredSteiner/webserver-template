@@ -17,7 +17,6 @@ import { User } from './db/documents/user';
 import * as debugsx from 'debug-sx';
 const debug: debugsx.IFullLogger = debugsx.createFullLogger('auth');
 
-const dbUser = DbUser.Instance;
 
 export class Auth {
   private static _instance: Auth;
@@ -110,7 +109,7 @@ export class Auth {
   private deserialize (req: express.Request, res: express.Response, next: express.NextFunction) {
     debug.fine('deserialize()');
     if (req.user.htlid) {
-      req.user.model = dbUser.getCachedUser(req.user.htlid);
+      req.user.model = DbUser.Instance.getCachedUser(req.user.htlid);
     }
     next();
   }
@@ -137,7 +136,7 @@ class MyPassport {
 
   public verify (req: express.Request, username: string, password: string,
                  done: (error: any, user?: any, options?: IVerifyOptions) => void) {
-    const user = dbUser.getCachedUser(username);
+    const user = DbUser.Instance.getCachedUser(username);
     const htlid = username;
     if (! (user instanceof User)) {
       debug.warn('unknown user %s', htlid);

@@ -136,6 +136,8 @@ export class Server {
       throw new Error('auth fails, missing token');
     }
     debug.fine('handleAuth(): response htlid and token');
+    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    DbUser.Instance.login(req.user.htlid, socket);
     res.json({ htlid: req.user.htlid, token: req.token });
   }
 

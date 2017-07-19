@@ -6,6 +6,7 @@ import { MongooseDatabase } from './mongoose-database';
 import { MongooseCollection } from './mongoose-collection';
 import { User } from './documents/user';
 import { IUser, IUserDocument, userSchema } from './schemas/user-schema';
+import * as password from './password';
 
 
 export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
@@ -50,6 +51,13 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     this._cache = {};
   }
 
+
+  public create (item: IUser): Promise<User> {
+    if (item.password && !password.isHashed(item.password)) {
+      item.password = password.generate(item.password);
+    }
+    return super.create(item);
+  }
 
   public findUserByHtlId(htlid: string): Promise<User> {
     return new Promise( (resolve, reject) => {

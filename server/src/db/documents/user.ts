@@ -14,6 +14,7 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
     super(document, journal);
   }
 
+
   public toObject (): IUserRecord {
     const obj: IUserRecord = {
       id: this._document._id,
@@ -25,9 +26,9 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
     if (firstname) {
       (<any>obj).firstname = firstname
     }
-    const passwordHash = this._document.firstname;
-    if (passwordHash) {
-      (<any>obj).passwordHash = passwordHash
+    const password = this._document.password;
+    if (password) {
+      (<any>obj).password = password
     }
     const savedAt = this._document.savedAt;
     if (savedAt) {
@@ -94,7 +95,11 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
     if ((!oldValue && !value) || (oldValue && value && oldValue.at === value.at && oldValue.socket === value.socket)) {
       return; // nothing new to set
     }
-    (<any>this._document).login = [ value ];
+    if (value) {
+      (<any>this._document).login = [ value ];
+    } else {
+      (<any>this._document).login = [ ];
+    }
     this._document.markModified('login');
     this.journalSet('login', oldValue, value);
   }
@@ -106,7 +111,11 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
     if ((!oldValue && !value) || (oldValue && value && oldValue.at === value.at && oldValue.socket === value.socket)) {
       return; // nothing new to set
     }
-    (<any>this._document).logout = [ value ];
+    if (value) {
+      (<any>this._document).logout = [ value ];
+    } else {
+      (<any>this._document).logout = [ ];
+    }
     this._document.markModified('logout');
     this.journalSet('logout', oldValue, value);
   }
