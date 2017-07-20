@@ -4,8 +4,8 @@ import { Database } from './core/database';
 import { Collection } from './core/collection';
 import { MongooseDatabase } from './core/mongoose-database';
 import { MongooseCollection } from './core/mongoose-collection';
-import { User } from './documents/user';
-import { IUser, IUserDocument, userSchema } from './schemas/user-schema';
+import { User } from './document/user';
+import { IUser, IUserDocument, userSchema } from './schema/user-schema';
 import * as password from '../password';
 
 
@@ -56,7 +56,7 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
     if (item.password && !password.isHashed(item.password)) {
       item.password = password.generate(item.password);
     }
-    return super.create(item);
+    return super.create(item, 'htlid=' + item.htlid);
   }
 
   public delete (item: User): Promise<boolean> {

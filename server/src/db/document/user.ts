@@ -2,9 +2,8 @@ import * as mongoose from 'mongoose';
 
 import { Journal } from '../core/journal';
 import { MongooseDocument } from '../core/mogoose-document';
-import { IUserLoginLogout } from '../schemas/user-schema';
 import { Document } from '../core/document';
-import { IUser, IUserDocument, IUserRecord } from '../schemas/user-schema';
+import { IUser, IUserDocument, IUserRecord, IUserLoginLogout } from '../schema/user-schema';
 import * as password from '../../password';
 
 export class User extends MongooseDocument<IUserRecord, IUserDocument> implements IUserRecord {
@@ -124,14 +123,20 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
 
 
   public set password (value: string) {
-    if (value && value.length > 0) {
-      value = password.isHashed(value) ? value : password.generate(value);
+    if (!this.verifyPassword(value)) {
+      if (value && value.length > 0) {
+        value = password.isHashed(value) ? value : password.generate(value);
+      }
+      this.setStringAttribute('password', value);
     }
-    this.setStringAttribute('password', value);
   }
 
   public verifyPassword (value: string): boolean {
-    return password.verify(value, this._document.password);
+    if (password.isHashed(value)) {
+      return value === this._document.password
+    } else {
+      return password.verify(value, this._document.password);
+    }
   }
 
   // The journal methods are implemented in base class Document and can be

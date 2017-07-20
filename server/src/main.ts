@@ -46,7 +46,11 @@ if (logfileConfig) {
   }
 }
 
-// start of application
+
+// ***********************************************************
+// startup of application
+//   ... things to do before server can be started
+// ***********************************************************
 
 import { Dbms } from './db/core/dbms';
 import { Database } from './db/core/database';
@@ -76,7 +80,6 @@ startupPromisses.push(new Promise<void>( (resolve, reject) => {
             continue;
           }
           const user = cachedUsers[u.user.htlid];
-          debugger;
           switch (u.command) {
             case 'create': {
               if (!user) {
@@ -113,6 +116,11 @@ startupPromisses.push(new Promise<void>( (resolve, reject) => {
     }).catch( err => { reject(err) } );
   })
 }));
+
+
+// ***********************************************************
+// start of server application
+// ***********************************************************
 
 import { Server } from './server';
 

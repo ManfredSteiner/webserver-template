@@ -52,14 +52,18 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
   }
 
 
-  public create (item: T): Promise<D> {
+  public create (item: T, journalMessage?: string): Promise<D> {
     return new Promise<D>( (resolve, reject) => {
+      const startedAt = Date.now();
+      this.journalCreate(journalMessage, startedAt);
       this._model.create(item).then( (d) => {
         const document = this.createDocument(d);
-        this.journalCreate(document);
-        // document.journalCreate();
+        this.journalDone(document, startedAt, true);
         resolve(document);
-      }).catch( err => { reject(err); } );
+      }).catch( err => {
+        this.journalCreateErr(journalMessage, err, startedAt);
+        reject(err);
+      });
     });
   }
 
@@ -68,19 +72,21 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
     return new Promise<boolean>( (resolve, reject) => {
       const startedAt = Date.now();
       this.journalDelete(item, startedAt);
-      this._model.remove((<any>item)._document).then( res => {
+      this._model.remove({ _id: item.id}).then( res => {
         const result: mongodb.DeleteWriteOpResultObject = <any>res;
         if (!result || !result.result) {
-          reject('invalid response from mongodb';
+          reject('invalid response from mongodb');
         } else if (result.result.ok && result.result.n === 1) {
-           this.journalDone(item, startedAt);
-           // item.journalDelete();
+           this.journalDone(item, startedAt, true);
            resolve(true);
          } else {
-           reject(new Error('mongodb cannot delete document:' + 
-                            ' ok=' + result.result.ok) + ', n=' + result.result.n);
+          throw new Error('mongodb cannot delete document:' +
+                          ' ok=' + result.result.ok + ', n=' + result.result.n);
          }
-      }).catch( err => reject(err) );
+      }).catch( err => {
+        this.journalErr(item, err, startedAt);
+        reject(err);
+      });
     });
   }
 

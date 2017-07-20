@@ -23,7 +23,8 @@
   "users": [
     { "command": "create", "user": { "htlid": "admin", "surname": "Admin", "password": "geheim" } },
     { "command": "delete", "user": { "htlid": "gast" } },
-    { "command": "delete", "user": { "htlid": "max", "surname": "Muster", "firstname": "Max", "password": "Super123" } }
+    { "command": "create", "user": { "htlid": "max", "surname": "Muster", "firstname": "Max", "password": "passin" } },
+    { "command": "modify", "user": { "htlid": "max", "surname": "Muster", "firstname": "Max", "password": "passin" } }
   ]
   
 }

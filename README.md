@@ -1,26 +1,30 @@
-# JSON Web Token
+# User management with MongoDB and JSON Web Token
+
+This step continues **[step8b-json-web-token](../../blob/step8b-json-web-token/README.md)**.
 
 ## Goals
 
 #### Server side (Node.js express)
 
-* How to create and verify access tokens.
-* How to handle restriced data resources.
-
-#### Client side (Angular 2+ application)
-
-* How to login and logut the user using an access-token.
-* How to get restriced data from server (server time).
-
+* How to use the database **MongoDB** to manage users.
+* How to use **mongoose** to implement database schemes.
+* How to use **password-hash** for password hashes.
 
 ## Prerequisites
 
-Install the module **[jsonwebtoken][npm-jsonwebtoken]** and **[express-jwt][npm-express-jwt]**.
+Install the [mongodb package][mongodb-install] and the 
+
+Install the module **[jsonwebtoken][npm-jsonwebtoken]**, **[express-jwt][npm-express-jwt]**, 
+**[mongoose][npm-mongoose]**, **[password-hash][npm-password-hash]** and the typescript types for
+mongodb (**[@types/mongodb][npm-types-mongodb]**).
 
 ```
 cd server
 npm install --save jsonwebtoken @types/jsonwebtoken
 npm install --save express-jwt @types/express-jwt
+npm install --save mongoose @types/mongoose
+npm install --save password-hash @types/password-hash
+npm install --save @types/mongodb
 cd ..
 ```
 
@@ -54,41 +58,99 @@ You can verify token functionality with tool **curl**:
 Get a new access token with:
 ```
 curl -i -X POST -H 'Content-Type: application/json' -d '{ "htlid": "sx", "password": "geheim" }' localhost:8080/auth
-
 ```
 Check access to restricted data with ... (replace <token> with the token you get with the previous step):
 ```
 curl -H 'Authorization: Bearer <token>' localhost:8080/data/time
 ```
 
-## Server side (Node.js express)
+## MongoDB flash tutorial
 
-#### Modified source files
+Follow the link [MongoDB shell][mongodb-shell] to get some more information in detail.
 
-* [server/src/server.ts](server/src/server.ts)
+The following descriptions are valid on Linux systems. 
 
-#### New files
+Make sure, that the **mongod** service is running on your system:
 
-* [server/src/user.ts](server/src/user.ts)
-* [server/src/db-user.ts](server/src/db-user.ts)
-* [server/src/auth.ts](server/src/auth.ts)
+```
+sudo systemctl status mongod
+sudo systemctl start mongod
+```
 
-## Client side (Angular 2+ application)
+If the service is running, you can start **MongoDB shell** with the shell command **mongo**. 
+Inside the MongoDB shell you can use the following commands (and much more).
+
+```
+use webserver
+show collections
+db.users.find()
+db.users.find({ htlid: "admin" }).pretty()
+db.users.drop()
+exit
+```
+
+## Configuration
+
+The file [server/config.json](server/config.json contains configuration data for the server application 
+and the user database. The array `users` contains objects which describe what's to do before the server 
+application starts.
+
+Each *user-object* must contain the attribute *command* and `user`. The attribute `command` defines the action, and the attribute *user* 
+the data which are needed to perform the action.
+
+The following commands are allowed:
+* "**create**"  
+  Create the specified user if it is not available in the database.
+* "**modify**"  
+  Change some attributes in the database (in example the password). 
+* "**delete**"  
+  Delete a user from database. 
+* "**ignore**"  
+  Ignore this object.
 
 
-#### Modified source files
+## OOP concept for MongoDB access
 
-* [ng2/src/app/profil.component.ts](ng2/src/app/profil.component.ts)
-* [ng2/src/app/app.component.ts](ng2/src/app/app.component.ts)
-* [ng2/src/app/app.module.ts](ng2/src/app/app.module.ts)
-* [ng2/src/app/services/user.service.ts](ng2/src/app/services/user.service.ts)
+The namings in MongoDB differs a little bit from SQL oriented databases like *MySQL* or *PostgreSQL* (**DBMS** means *Database Management System*):
 
-## Additional infos
+ SQL DBMS | MongoDB DBMS
+ :----------: | :--------------:
+ Database | Database 
+ Table    | Collection 
+ Record   | Document 
+-------------------------
 
-* [Token based authentication][hyphe-blog-toke-based-auth]
+The directory [server/src/db](server/src/db) contains all files for database access.
 
+* Database classes to access a MongoDB collection.  
+  For example the singleton class **DbUser** in file [server/src/db/db-user.ts](server/src/db/db-user.ts)
+* Subdirectory [server/src/db/cors](server/src/db/cors):  
+  Contains all abstract classes and base classes.
+* Subdirectory [server/src/db/schema](server/src/db/schema):  
+  Contains schemes files to define a data model, 
+  for example the file [server/src/db/schema/user-schema.ts](server/src/db/schema/user-schema.ts).
+* Subdirectory [server/src/db/document](server/src/db/document):  
+  All data model classes, 
+  for example the file [server/src/db/document/user.ts](server/src/db/document/user.ts).
+
+OO-Concept idea:
+
+* **Database Management System**:  
+  Singleton class **[Dbms](server/src/db/core/dbms.ts)**
+* **Database**:  
+  Class **[MongooseDatabase](server/src/db/core/mongoose-database.ts)** -> abstract class **[Database](server/src/db/core/database.ts)**
+* **Collection (Table)**:  
+  Class **[MongooseCollection](server/src/db/core/mongoose-collection.ts)** -> abstract Class **[Collection](server/src/db/core/collection.ts)**
+* **Document (Record)**:  
+  Class **[User](server/src/db/document/user.ts)** -> abstract class **[MongooseDocument](server/src/db/core/mongoose-document.ts)** -> abstract class **[Document](server/src/db/core/document.ts)**
+  
+If you want to change the database, replace **Dbms**, **Database**, **Collection** and **Document**.
 
 [npm-cors]: https://www.npmjs.com/package/cors
+[mongodb-install]: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 [npm-jsonwebtoken]: https://www.npmjs.com/package/jsonwebtoken
 [npm-express-jwt]: https://www.npmjs.com/package/express-jwt
-[hyphe-blog-toke-based-auth]: https://blog.hyphe.me/token-based-authentication-with-node/
+[npm-mongoose]: https://www.npmjs.com/package/mongoose
+[npm-password-hash]: https://www.npmjs.com/package/password-hash
+[npm-types-mongodb]: https://www.npmjs.com/package/@types/mongodb
+[mongodb-shell]: [https://docs.mongodb.com/getting-started/shell/client/]
