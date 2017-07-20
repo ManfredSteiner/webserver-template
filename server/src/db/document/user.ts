@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 
 import { Journal } from '../core/journal';
-import { MongooseDocument } from '../core/mogoose-document';
+import { MongooseDocument } from '../core/mongoose-document';
 import { Document } from '../core/document';
 import { IUser, IUserDocument, IUserRecord, IUserLoginLogout } from '../schema/user-schema';
 import * as password from '../../password';

@@ -13,8 +13,8 @@ import * as fs from 'fs';
 
 // import modules of this project
 import { DbUser } from './db/db-user';
-import { IUser } from './db/schemas/user-schema';
-import { User } from './db/documents/user';
+import { IUser } from './db/schema/user-schema';
+import { User } from './db/document/user';
 import { Auth, DbAuthError } from './auth';
 
 // logging with debug-sx/debug

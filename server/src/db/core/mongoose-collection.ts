@@ -4,10 +4,11 @@ import * as mongoose from 'mongoose';
 import * as debugsx from 'debug-sx';
 
 import { Dbms } from './dbms';
+import { MongooseDbms } from './mongoose-dbms';
 import { MongooseDatabase } from './mongoose-database';
 import { Document } from './document';
 import { Collection } from './collection';
-import { MongooseDocument } from './mogoose-document';
+import { MongooseDocument } from './mongoose-document';
 
 
 export abstract class MongooseCollection<T, D extends Document<T>, MD extends mongoose.Document> extends Collection<T, D> {
@@ -27,7 +28,7 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
     this._schema = schema;
     // this._model = mongoose.model<D>(name, schema);
     if (!db) {
-      db = <MongooseDatabase>Dbms.getDatabase();
+      db = MongooseDbms.Instance.getDatabase();
       if (!db) {
         throw new Error('No database connected');
       }

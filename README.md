@@ -78,6 +78,10 @@ sudo systemctl start mongod
 ```
 
 If the service is running, you can start **MongoDB shell** with the shell command **mongo**. 
+```
+mongo
+```
+
 Inside the MongoDB shell you can use the following commands (and much more).
 
 ```
@@ -124,7 +128,7 @@ The directory [server/src/db](server/src/db) contains all files for database acc
 
 * Database classes to access a MongoDB collection.  
   For example the singleton class **DbUser** in file [server/src/db/db-user.ts](server/src/db/db-user.ts)
-* Subdirectory [server/src/db/cors](server/src/db/cors):  
+* Subdirectory [server/src/db/core](server/src/db/core):  
   Contains all abstract classes and base classes.
 * Subdirectory [server/src/db/schema](server/src/db/schema):  
   Contains schemes files to define a data model, 
@@ -136,7 +140,7 @@ The directory [server/src/db](server/src/db) contains all files for database acc
 OO-Concept idea:
 
 * **Database Management System**:  
-  Singleton class **[Dbms](server/src/db/core/dbms.ts)**
+  Singleton class **[MongooseDbms](server/src/db/core/mongoose-dbms.ts)** -> **[Dbms](server/src/db/core/dbms.ts)**
 * **Database**:  
   Class **[MongooseDatabase](server/src/db/core/mongoose-database.ts)** -> abstract class **[Database](server/src/db/core/database.ts)**
 * **Collection (Table)**:  
@@ -144,7 +148,7 @@ OO-Concept idea:
 * **Document (Record)**:  
   Class **[User](server/src/db/document/user.ts)** -> abstract class **[MongooseDocument](server/src/db/core/mongoose-document.ts)** -> abstract class **[Document](server/src/db/core/document.ts)**
   
-If you want to change the database, replace **Dbms**, **Database**, **Collection** and **Document**.
+If you want to change the database, you just jave to replace **MongooseDbms**, **MongooseDatabase**, **MongooseCollection** and **MongooseDocument** by classes for your database replacement.
 
 [npm-cors]: https://www.npmjs.com/package/cors
 [mongodb-install]: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/

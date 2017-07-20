@@ -53,6 +53,7 @@ if (logfileConfig) {
 // ***********************************************************
 
 import { Dbms } from './db/core/dbms';
+import { MongooseDbms } from './db/core/mongoose-dbms';
 import { Database } from './db/core/database';
 import { DbUser } from './db/db-user';
 import * as mongoose from 'mongoose';
@@ -61,7 +62,8 @@ import * as mongoose from 'mongoose';
 const startupPromisses: Promise<void> [] = [];
 
 startupPromisses.push(new Promise<void>( (resolve, reject) => {
-  Dbms.openDatabase('webserver').then( db => {
+  const dbms: Dbms = MongooseDbms.Instance;
+  dbms.openDatabase('webserver').then( db => {
     debug.info('Database %s connected', db.name());
     const dbUser = DbUser.createInstance(db);
     dbUser.findAll().then( users => {
