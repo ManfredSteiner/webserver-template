@@ -11,6 +11,7 @@ export abstract class Document<T> {
   public abstract get id (): string;
   public abstract toObject(): T;
   public abstract save (): Promise<boolean>;
+  public abstract isModified (): boolean;
 
   protected journalSet (attributeName: string, oldValue: any, newValue: any) {
     if (this._journal && this._journal.set.enabled) {

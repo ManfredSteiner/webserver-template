@@ -17,6 +17,10 @@ export abstract class MongooseDocument<T, D extends mongoose.Document> extends D
     return this._document._id;
   }
 
+  public isModified (): boolean {
+    return this._document.isModified();
+  }
+
   public save (): Promise<boolean> {
     if (!this._document.isModified()) {
       return Promise.resolve(false);

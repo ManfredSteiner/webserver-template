@@ -48,10 +48,9 @@ if (logfileConfig) {
 
 // start of application
 
-import { Database } from './db/database';
+import { Dbms } from './db/core/dbms';
+import { Database } from './db/core/database';
 import { DbUser } from './db/db-user';
-import { Dbms } from './db/dbms';
-
 import * as mongoose from 'mongoose';
 (<any>mongoose).Promise = Promise;
 
@@ -64,14 +63,53 @@ startupPromisses.push(new Promise<void>( (resolve, reject) => {
     dbUser.findAll().then( users => {
       debug.info('%s users found', users.length);
       const cachedUsers = dbUser.getCachedDocuments();
-      const user = cachedUsers['admin'];
-      if (!user) {
-        dbUser.create({ htlid: 'admin', surname: 'Admin', password: 'geheim' }).then( adminUser => {
-          resolve();
-        }).catch( err => reject(err) );
-      } else {
-        resolve();
+      const usersConfig = nconf.get('users');
+      const userPromisses: Promise<any> [] = [];
+      if (Array.isArray(usersConfig)) {
+        for (const u of usersConfig) {
+          if (!u.user) {
+            debug.warn('config users: missing attribute user');
+            continue;
+          }
+          if (!u.user.htlid) {
+            debug.warn('config users: missing attribute htlid');
+            continue;
+          }
+          const user = cachedUsers[u.user.htlid];
+          debugger;
+          switch (u.command) {
+            case 'create': {
+              if (!user) {
+                userPromisses.push(dbUser.create(u.user).catch(err => debug.warn(err)) );
+              }
+              break;
+            }
+
+            case 'delete': {
+              if (user) {
+                userPromisses.push(dbUser.delete(user).catch(err => debug.warn(err)));
+              }
+              break;
+            }
+
+            case 'modify': {
+              if (user) {
+                user.surname = u.user.surname || user.surname;
+                user.firstname = u.user.firstname || user.firstname;
+                user.password = u.user.password || user.password;
+                userPromisses.push(user.save().catch(err => debug.warn(err)));
+              }
+              break;
+            }
+
+            case undefined: case 'ignore': break;
+            default: debug.warn('config users command %s not supported', u.command);
+          }
+        }
       }
+      Promise.all(userPromisses).then( () => {
+        resolve();
+      }).catch(err => reject(err));
     }).catch( err => { reject(err) } );
   })
 }));

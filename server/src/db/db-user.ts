@@ -1,12 +1,12 @@
 import * as mongoose from 'mongoose';
 
-import { Database } from './database';
-import { Collection } from './collection';
-import { MongooseDatabase } from './mongoose-database';
-import { MongooseCollection } from './mongoose-collection';
+import { Database } from './core/database';
+import { Collection } from './core/collection';
+import { MongooseDatabase } from './core/mongoose-database';
+import { MongooseCollection } from './core/mongoose-collection';
 import { User } from './documents/user';
 import { IUser, IUserDocument, userSchema } from './schemas/user-schema';
-import * as password from './password';
+import * as password from '../password';
 
 
 export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
@@ -57,6 +57,14 @@ export class DbUser extends MongooseCollection<IUser, User, IUserDocument > {
       item.password = password.generate(item.password);
     }
     return super.create(item);
+  }
+
+  public delete (item: User): Promise<boolean> {
+    const user = this._cache[item.htlid];
+    if (user) {
+      delete this._cache[item.htlid];
+    }
+    return super.delete(user);
   }
 
   public findUserByHtlId(htlid: string): Promise<User> {

@@ -70,12 +70,15 @@ export abstract class MongooseCollection<T, D extends Document<T>, MD extends mo
       this.journalDelete(item, startedAt);
       this._model.remove((<any>item)._document).then( res => {
         const result: mongodb.DeleteWriteOpResultObject = <any>res;
-         if (result.result.ok && result.result.n === 1) {
+        if (!result || !result.result) {
+          reject('invalid response from mongodb';
+        } else if (result.result.ok && result.result.n === 1) {
            this.journalDone(item, startedAt);
            // item.journalDelete();
            resolve(true);
          } else {
-           reject(new Error('unexpected response og mongodb'));
+           reject(new Error('mongodb cannot delete document:' + 
+                            ' ok=' + result.result.ok) + ', n=' + result.result.n);
          }
       }).catch( err => reject(err) );
     });

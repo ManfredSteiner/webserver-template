@@ -1,12 +1,11 @@
 import * as mongoose from 'mongoose';
 
-
-import { Journal } from '../journal';
-import { MongooseDocument } from '../mogoose-document';
+import { Journal } from '../core/journal';
+import { MongooseDocument } from '../core/mogoose-document';
 import { IUserLoginLogout } from '../schemas/user-schema';
-import { Document } from '../document';
+import { Document } from '../core/document';
 import { IUser, IUserDocument, IUserRecord } from '../schemas/user-schema';
-import * as password from '../password';
+import * as password from '../../password';
 
 export class User extends MongooseDocument<IUserRecord, IUserDocument> implements IUserRecord {
 
@@ -46,6 +45,9 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
   }
 
   public save (): Promise<boolean> {
+    if (!this.isModified()) {
+      return Promise.resolve(false);
+    }
     this._document.savedAt = Date.now();
     return super.save();
   }
@@ -122,12 +124,10 @@ export class User extends MongooseDocument<IUserRecord, IUserDocument> implement
 
 
   public set password (value: string) {
-    let newValue = value;
-    const oldValue = this._document.password;
     if (value && value.length > 0) {
-      newValue = password.isHashed(value) ? value : password.generate(value);
+      value = password.isHashed(value) ? value : password.generate(value);
     }
-    this._document.password = newValue;
+    this.setStringAttribute('password', value);
   }
 
   public verifyPassword (value: string): boolean {

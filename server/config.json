@@ -19,5 +19,11 @@
   "logfile": {
     "default": { "filename": "/tmp/webserver.log", "namespaces": "*::*", "locationNamespaces": "*" },
     "warnings": { "filename": "/tmp/webserver-warnings.log", "namespaces": "*::WARN", "locationNamespaces": "-*" }
-  }
+  },
+  "users": [
+    { "command": "create", "user": { "htlid": "admin", "surname": "Admin", "password": "geheim" } },
+    { "command": "delete", "user": { "htlid": "gast" } },
+    { "command": "delete", "user": { "htlid": "max", "surname": "Muster", "firstname": "Max", "password": "Super123" } }
+  ]
+  
 }
