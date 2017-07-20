@@ -42,16 +42,55 @@ export class MongooseDbms extends Dbms {
   }
 
   public getDatabase (name?: string): MongooseDatabase {
+    let db: MongooseDatabase;
     if (!name || name.length === 0) {
       const dbCnt = Object.keys(this._databaseMap).length;
       switch (dbCnt) {
-        case 0: return undefined;
-        case 1: return this._databaseMap[Object.keys(this._databaseMap)[0]];
+        case 0: db = undefined; break;
+        case 1: db = this._databaseMap[Object.keys(this._databaseMap)[0]]; break;
         default: throw new Error('More than one database available, use name to specify which database');
       }
+    } else {
+      db = this._databaseMap[name];
     }
-    return this._databaseMap[name];
+    if (db) {
+      if (db.isConnected()) {
+        return db;
+      } else {
+        db.close();
+      }
+    }
+    return undefined;
   }
 
+  public closeDatabase (db: Database) {
+    for (const name of Object.keys(this._databaseMap)) {
+      if (this._databaseMap[name] === db) {
+        delete this._databaseMap[name];
+        break;
+      }
+    }
+    return db.close();
+  }
+
+  public shutdown (): Promise<MongooseDatabase> [] {
+    const rv: Promise<MongooseDatabase> [] = [];
+    for (const name in this._databaseMap) {
+      if (this._databaseMap.hasOwnProperty(name)) {
+        const db = this._databaseMap[name];
+        delete this._databaseMap[name];
+        rv.push(new Promise<MongooseDatabase>( (resolve, reject) => {
+          db.close().then( closed => {
+            if (closed) {
+              resolve(db);
+            } else {
+              reject(new Error('error on closing database ' + db.name));
+            }
+          }).catch( err => reject(err));
+        }));
+      }
+    }
+    return rv;
+  }
 }
 

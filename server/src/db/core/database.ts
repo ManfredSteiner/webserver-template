@@ -6,7 +6,7 @@ const debug: debugsx.ISimpleLogger = debugsx.createSimpleLogger('db:database');
 
 export abstract class Database {
 
-  public abstract close (): boolean;
+  public abstract close (): Promise<boolean>;
   public abstract isConnected (): boolean;
   public abstract getCollectionNames (): Promise<string []>;
   public abstract name (): string;

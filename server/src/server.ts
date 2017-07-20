@@ -110,6 +110,18 @@ export class Server {
   }
 
 
+   public stop (): Promise<boolean> {
+     return new Promise<boolean>( (resolve, reject) => {
+       if (!this._server) {
+         resolve(false);
+       } else {
+         this._server.close( () => {
+           resolve(true);
+         });
+       }
+     });
+   }
+
   private requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
     debug.info('%s %s from %s', req.method, req.url, clientSocket);

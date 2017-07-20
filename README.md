@@ -140,7 +140,7 @@ The directory [server/src/db](server/src/db) contains all files for database acc
 OO-Concept idea:
 
 * **Database Management System**:  
-  Singleton class **[MongooseDbms](server/src/db/core/mongoose-dbms.ts)** -> **[Dbms](server/src/db/core/dbms.ts)**
+  Singleton class **[MongooseDbms](server/src/db/core/mongoose-dbms.ts)** -> abstract class **[Dbms](server/src/db/core/dbms.ts)**
 * **Database**:  
   Class **[MongooseDatabase](server/src/db/core/mongoose-database.ts)** -> abstract class **[Database](server/src/db/core/database.ts)**
 * **Collection (Table)**:  

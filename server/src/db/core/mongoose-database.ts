@@ -32,13 +32,17 @@ export class MongooseDatabase extends Database {
     });
   }
 
-  public close (): boolean {
+  public close (): Promise<boolean> {
     if (!this.isConnected()) {
-      return false;
+      return Promise.resolve(false);
     }
-    this._conn.close();
+    const connection = this._conn;
     this._conn = undefined;
-    return true;
+    return new Promise<boolean>( (resolve, reject) => {
+      connection.close().then( result => {
+        resolve(true);
+      }).catch(err => reject(err) );
+    });
   }
 
   public isConnected (): boolean {
