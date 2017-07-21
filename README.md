@@ -9,6 +9,8 @@ This step continues **[step8b-json-web-token](../../blob/step8b-json-web-token/R
 * How to use the database **MongoDB** to manage users.
 * How to use **mongoose** to implement database schemes.
 * How to use **password-hash** for password hashes.
+* How to handle server startup and shutdown with Promises.
+* How to handle nested database schemes. 
 
 ## Prerequisites
 
@@ -113,16 +115,22 @@ The following commands are allowed:
   Ignore this object.
 
 
+## Server startup and shutdown
+
+Startup and shutdown is handled in file [server/src/main.ts](server/src/main.ts).  
+
+You can enable automatic shutdown after a specified time by setting the attribute `shutdownMillis` in [/server/config.json](/server/config.json) with the desired milliseconds. A value less or equal than 0 will disable the automatic shutdown. 
+
+
 ## OOP concept for MongoDB access
 
 The namings in MongoDB differs a little bit from SQL oriented databases like *MySQL* or *PostgreSQL* (**DBMS** means *Database Management System*):
 
- SQL DBMS | MongoDB DBMS
+ SQL DBMS     | MongoDB DBMS
  :----------: | :--------------:
- Database | Database 
- Table    | Collection 
- Record   | Document 
--------------------------
+ Database     | Database 
+ Table        | Collection 
+ Record       | Document 
 
 The directory [server/src/db](server/src/db) contains all files for database access.
 

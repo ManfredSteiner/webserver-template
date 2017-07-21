@@ -129,20 +129,23 @@ import { Server } from './server';
 Promise.all(startupPromisses).then( () => {
   const server = new Server();
   server.start(8080).then( () => {
-    setTimeout( () => {
-      debug.info('application timeout, starting shutdown ...');
-      let shutDownPromisses: Promise<any> [] = [];
-      shutDownPromisses.push(server.stop().catch(err => console.log(err) ));
-      shutDownPromisses = shutDownPromisses.concat(MongooseDbms.Instance.shutdown());
-      Promise.all(shutDownPromisses).then( (result) => {
-        console.log('shutdown successful');
-        process.exit(0);
-      }).catch( err => {
-        console.log(err);
-        console.log('shutdown fails');
-        process.exit(1);
-      })
-    }, 10000);
+    const shutdownMillis = +nconf.get('shutdownMillis');
+    if (shutdownMillis > 0) {
+      setTimeout( () => {
+        debug.info('application timeout, starting shutdown ...');
+        let shutDownPromisses: Promise<any> [] = [];
+        shutDownPromisses.push(server.stop().catch(err => console.log(err) ));
+        shutDownPromisses = shutDownPromisses.concat(MongooseDbms.Instance.shutdown());
+        Promise.all(shutDownPromisses).then( (result) => {
+          console.log('shutdown successful');
+          process.exit(0);
+        }).catch( err => {
+          console.log(err);
+          console.log('shutdown fails');
+          process.exit(1);
+        })
+      }, shutdownMillis);
+    }
   }).catch(err => {
       console.log(err);
       console.log('Error: Start of server fails');
