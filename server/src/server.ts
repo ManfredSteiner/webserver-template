@@ -154,9 +154,20 @@ export class Server {
   }
 
 
-  private handleAuthenticatedRequest (req: express.Request, res: express.Response, next: express.NextFunction) {
+  private handleAuthenticatedRequest (req: IRequestWithUser, res: express.Response, next: express.NextFunction) {
     if (!req.user || !req.user.model || !(req.user.model instanceof User)) {
       debug.warn('request %s %s not authenticated', req.method, req.originalUrl);
+      res.status(401).json({ error: 'Not authenticated'});
+      return;
+    }
+    if (req.user.model.logout) {
+      debug.warn('request %s %s not authenticated (user logout)', req.method, req.originalUrl);
+      res.status(401).json({ error: 'Not authenticated'});
+      return;
+    }
+    const login = req.user.model.login;
+    if (!login || login.at > req.user.iat) {
+      debug.warn('request %s %s not authenticated (token iat before login)', req.method, req.originalUrl);
       res.status(401).json({ error: 'Not authenticated'});
       return;
     }
