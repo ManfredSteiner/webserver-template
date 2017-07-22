@@ -116,7 +116,7 @@ startupPromisses.push(new Promise<void>( (resolve, reject) => {
         resolve();
       }).catch(err => reject(err));
     }).catch( err => { reject(err) } );
-  })
+  }).catch( err => { reject(err) } );
 }));
 
 

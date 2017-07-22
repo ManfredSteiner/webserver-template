@@ -155,18 +155,22 @@ export class Server {
 
 
   private handleAuthenticatedRequest (req: IRequestWithUser, res: express.Response, next: express.NextFunction) {
-    if (!req.user || !req.user.model || !(req.user.model instanceof User)) {
+    if (!req.user || !req.user.iat || !req.user.exp || !req.user.model || !(req.user.model instanceof User)) {
       debug.warn('request %s %s not authenticated', req.method, req.originalUrl);
       res.status(401).json({ error: 'Not authenticated'});
       return;
     }
+    // req.user.iat = req.user.iat * 1000; // convert to epoch time in milliseconds
+    // req.user.exp = req.user.exp * 1000; // convert to epoch time in milliseconds
     if (req.user.model.logout) {
       debug.warn('request %s %s not authenticated (user logout)', req.method, req.originalUrl);
       res.status(401).json({ error: 'Not authenticated'});
       return;
     }
     const login = req.user.model.login;
-    if (!login || login.at > req.user.iat) {
+    // login.at is epoch time in milliseconds
+    // rq.user.iat (from jsonwebtoken) is epach tim in seconds)
+    if (!login || Math.floor(login.at / 1000) > req.user.iat) {
       debug.warn('request %s %s not authenticated (token iat before login)', req.method, req.originalUrl);
       res.status(401).json({ error: 'Not authenticated'});
       return;

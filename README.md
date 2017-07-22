@@ -12,9 +12,31 @@ This step continues **[step8b-json-web-token](../../blob/step8b-json-web-token/R
 * How to handle server startup and shutdown with Promises.
 * How to handle nested database schemes. 
 
+#### Not solved
+
+* Refresh tokens
+* Page reload when used from different browsers
+* Logout in case of login on other browser
+
 ## Prerequisites
 
-Install the [mongodb package][mongodb-install] and the 
+Install [mongodb software package][mongodb-install].
+
+#### From scratch ...
+
+Execute in shell:
+
+```
+git clone -b step9-mongodb https://github.com/ManfredSteiner/webserver-template
+cd webserver-template/ng2
+npm install
+ng build
+cd ../server
+npm install
+npm run
+```
+
+#### Continue from branch step8b ...
 
 Install the module **[jsonwebtoken][npm-jsonwebtoken]**, **[express-jwt][npm-express-jwt]**, 
 **[mongoose][npm-mongoose]**, **[password-hash][npm-password-hash]** and the typescript types for

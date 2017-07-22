@@ -1,5 +1,5 @@
 {
-  "shutdownMillis": 5000,
+  "shutdownMillis": -1,
   "admin": {
     "name": "Max Mustermann",
     "mail": "max@mustermann.com"
