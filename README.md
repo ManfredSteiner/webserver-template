@@ -12,7 +12,7 @@ This step continues **[step8b-json-web-token](../../blob/step8b-json-web-token/R
 * How to handle server startup and shutdown with Promises.
 * How to handle nested database schemes. 
 
-#### Not solved
+#### Not solved yet
 
 * Refresh tokens
 * Page reload when used from different browsers
@@ -33,10 +33,10 @@ npm install
 ng build
 cd ../server
 npm install
-npm run
+npm start
 ```
 
-#### Continue from branch step8b ...
+#### Alternative: continue from branch step8b ...
 
 Install the module **[jsonwebtoken][npm-jsonwebtoken]**, **[express-jwt][npm-express-jwt]**, 
 **[mongoose][npm-mongoose]**, **[password-hash][npm-password-hash]** and the typescript types for
@@ -51,6 +51,8 @@ npm install --save password-hash @types/password-hash
 npm install --save @types/mongodb
 cd ..
 ```
+
+#### RSA public and private key for JSON Webtoken
 
 Key pairs are already available in this branch (subdirectory [server/keys](server/keys)). But you can also create your own key pair:. Replace afterwards the filenames in the configuration file (attribute `auth` in file [server/config.json](server/config.json)).
 
