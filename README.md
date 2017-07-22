@@ -114,6 +114,12 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to implement restriced data resources.
   + How to login and logut the user using an access-token.
 
+* [step9-mongodb](../../blob/step9-mongodb/README.md)
+* How to use the database **MongoDB** to manage users.
+* How to use **mongoose** to implement database schemes.
+* How to use **password-hash** for password hashes.
+* How to handle server startup and shutdown with Promises.
+* How to handle nested database schemes.
 
   
 [nodejs]: https://nodejs.org/en/
