@@ -1,22 +1,37 @@
-# User management with MongoDB and JSON Web Token
+# Modal dialogs with Angular 2+
 
-This step continues **[step8b-json-web-token](../../blob/step8b-json-web-token/README.md)**.
+This step continues **[step9-mongodb](../../blob/step9-mongodb/README.md)**.
 
 ## Goals
 
 #### Server side (Node.js express)
 
-* How to use the database **MongoDB** to manage users.
-* How to use **mongoose** to implement database schemes.
-* How to use **password-hash** for password hashes.
-* How to handle server startup and shutdown with Promises.
-* How to handle nested database schemes. 
+* How to support Bootstrap V4
 
-#### Not solved yet
+#### Client side (Angular v4)
 
-* Refresh tokens
-* Page reload when used from different browsers
-* Logout in case of login on other browser
+* How to use Bootstrap V4
+* How to implement the modal dialogs.
+* How to user modal dialogs for login.
+* How to dynamically create and remove components.
+* How to handle authentication if user logout from another session.
+ 
+#### Desired behavior
+
+Short term access token allow access on server data. If access fails the long term 
+remote token can be used to get a new access token.
+
+A new user login makes token in other session unuseable. In this case a modal login 
+dialog should appear to relogin.
+
+Same situation if user has logged out. In this case, all previous given tokens (access token 
+and remote token) are not longer useable.
+
+Remote tokens are valid for the same day. So re-login is needed on next day.  
+Renewing an access token is done automatically by the [UserService][ngx/src/services/user.service.ts]. 
+If the remote token is not longer valid, a modal login dialog with the previously used htlid is opened 
+automatically.
+
 
 ## Prerequisites
 
@@ -27,166 +42,75 @@ Install [mongodb software package][mongodb-install].
 Execute in shell:
 
 ```
-git clone -b step9-mongodb https://github.com/ManfredSteiner/webserver-template
-cd webserver-template/ng2
+git clone -b step10-modal-dialog https://github.com/ManfredSteiner/webserver-template
+cd webserver-template/ngx
 npm install
-ng build
+npm run build
 cd ../server
 npm install
 npm start
 ```
 
-#### Alternative: continue from branch step8b ...
+#### Alternative: continue from branch step9 ...
 
-Install the module **[jsonwebtoken][npm-jsonwebtoken]**, **[express-jwt][npm-express-jwt]**, 
-**[mongoose][npm-mongoose]**, **[password-hash][npm-password-hash]** and the typescript types for
-mongodb (**[@types/mongodb][npm-types-mongodb]**).
+At the moment (july 2017) the version `@next` is needed for package `bootstrap` to ensure that Bootstrap V4 is installed.   
+Also `window.__theme = 'bs4'` is needed in [server/src/views/ngmain.pug](server/src/views/ngmain.pug) and
+[ngx/src/index.html](ngx/src/index.html) (see [Using with Bootstrap 4 with angular-cli][info-bootstrap4-ngx-cli]).
 
-```
-cd server
-npm install --save jsonwebtoken @types/jsonwebtoken
-npm install --save express-jwt @types/express-jwt
-npm install --save mongoose @types/mongoose
-npm install --save password-hash @types/password-hash
-npm install --save @types/mongodb
-cd ..
-```
-
-#### RSA public and private key for JSON Webtoken
-
-Key pairs are already available in this branch (subdirectory [server/keys](server/keys)). But you can also create your own key pair:. Replace afterwards the filenames in the configuration file (attribute `auth` in file [server/config.json](server/config.json)).
+Install the module ...
 
 ```
-cd server
-mkdir keys
-openssl genrsa -out keys/server-private.pem
-openssl rsa -in keys/server-private.pem -pubout -out keys/server-public.pem
-cd ..
-```
-
-
-Make sure, that the Angular 2+ application bundles are available in subdirectory [ng2/dist](ng2/dist). Use the following command (or keyboard shortcut *CTRL + N* ) to build them:
-
-```
-cd ng2
-ng build
+cd ngx
+npm install --save ngx-bootstrap bootstrap@next
 cd ..
 ```
 
 ## Usage
 
-You can start the express server to handle all client requests (Angular application and login POST request).
+The [ServerService](ngx/src/services/server.service.ts) checks if Angular application is running 
+in development mode or in production mode. The mode descides which server host is used for requests.
 
-Or you can start the Angular application via `ng serve`, and start the express server as for handling the POST request. In that case the module [cors][npm-cors] must be enabled as express middleware, otherwise the request will fail.
+#### Development mode
 
-You can verify token functionality with tool **curl**:
-
-Get a new access token with:
-```
-curl -i -X POST -H 'Content-Type: application/json' -d '{ "htlid": "sx", "password": "geheim" }' localhost:8080/auth
-```
-Check access to restricted data with ... (replace <token> with the token you get with the previous step):
-```
-curl -H 'Authorization: Bearer <token>' localhost:8080/data/time
-```
-
-## MongoDB flash tutorial
-
-Follow the link [MongoDB shell][mongodb-shell] to get some more information in detail.
-
-The following descriptions are valid on Linux systems. 
-
-Make sure, that the **mongod** service is running on your system:
+When **ng serve** is called, the application is running in development mode. This means
+that the server must be startet as seperate application on same host. All server requests
+will be made to `localhost:8080` instead using the socket of the ng server (port 4200).
 
 ```
-sudo systemctl status mongod
-sudo systemctl start mongod
+cd ngx
+ng serve
+```
+```
+cd server
+npm start
+```
+#### Production mode
+
+When server app should also support loading of Angular app, a build of the Angular app 
+is needed every time if something changes. Angular application is build in production mode 
+(see [package.json](ngx/package.json)).
+```
+cd ngx
+npm run build
+```
+```
+cd server
+npm start
 ```
 
-If the service is running, you can start **MongoDB shell** with the shell command **mongo**. 
-```
-mongo
-```
+## Additional infos
 
-Inside the MongoDB shell you can use the following commands (and much more).
+* [How to use the ngx-bootstrap component **AlertModule**][info-ngx-bootstrap-with-ng-cli]
+* [Dynamically create and remove components][info-ngx-dynamic-component-loader]
 
-```
-use webserver
-show collections
-db.users.find()
-db.users.find({ htlid: "admin" }).pretty()
-db.users.drop()
-exit
-```
-
-## Configuration
-
-The file [server/config.json](server/config.json contains configuration data for the server application 
-and the user database. The array `users` contains objects which describe what's to do before the server 
-application starts.
-
-Each *user-object* must contain the attribute *command* and `user`. The attribute `command` defines the action, and the attribute *user* 
-the data which are needed to perform the action.
-
-The following commands are allowed:
-* "**create**"  
-  Create the specified user if it is not available in the database.
-* "**modify**"  
-  Change some attributes in the database (in example the password). 
-* "**delete**"  
-  Delete a user from database. 
-* "**ignore**"  
-  Ignore this object.
-
-
-## Server startup and shutdown
-
-Startup and shutdown is handled in file [server/src/main.ts](server/src/main.ts).  
-
-You can enable automatic shutdown after a specified time by setting the attribute `shutdownMillis` in [/server/config.json](/server/config.json) with the desired milliseconds. A value less or equal than 0 will disable the automatic shutdown. 
-
-
-## OOP concept for MongoDB access
-
-The namings in MongoDB differs a little bit from SQL oriented databases like *MySQL* or *PostgreSQL* (**DBMS** means *Database Management System*):
-
- SQL DBMS     | MongoDB DBMS
- :----------: | :--------------:
- Database     | Database 
- Table        | Collection 
- Record       | Document 
-
-The directory [server/src/db](server/src/db) contains all files for database access.
-
-* Database classes to access a MongoDB collection.  
-  For example the singleton class **DbUser** in file [server/src/db/db-user.ts](server/src/db/db-user.ts)
-* Subdirectory [server/src/db/core](server/src/db/core):  
-  Contains all abstract classes and base classes.
-* Subdirectory [server/src/db/schema](server/src/db/schema):  
-  Contains schemes files to define a data model, 
-  for example the file [server/src/db/schema/user-schema.ts](server/src/db/schema/user-schema.ts).
-* Subdirectory [server/src/db/document](server/src/db/document):  
-  All data model classes, 
-  for example the file [server/src/db/document/user.ts](server/src/db/document/user.ts).
-
-OO-Concept idea:
-
-* **Database Management System**:  
-  Singleton class **[MongooseDbms](server/src/db/core/mongoose-dbms.ts)** -> abstract class **[Dbms](server/src/db/core/dbms.ts)**
-* **Database**:  
-  Class **[MongooseDatabase](server/src/db/core/mongoose-database.ts)** -> abstract class **[Database](server/src/db/core/database.ts)**
-* **Collection (Table)**:  
-  Class **[MongooseCollection](server/src/db/core/mongoose-collection.ts)** -> abstract Class **[Collection](server/src/db/core/collection.ts)**
-* **Document (Record)**:  
-  Class **[User](server/src/db/document/user.ts)** -> abstract class **[MongooseDocument](server/src/db/core/mongoose-document.ts)** -> abstract class **[Document](server/src/db/core/document.ts)**
-  
-If you want to change the database, you just jave to replace **MongooseDbms**, **MongooseDatabase**, **MongooseCollection** and **MongooseDocument** by classes for your database replacement.
-
-[npm-cors]: https://www.npmjs.com/package/cors
 [mongodb-install]: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-[npm-jsonwebtoken]: https://www.npmjs.com/package/jsonwebtoken
-[npm-express-jwt]: https://www.npmjs.com/package/express-jwt
-[npm-mongoose]: https://www.npmjs.com/package/mongoose
-[npm-password-hash]: https://www.npmjs.com/package/password-hash
-[npm-types-mongodb]: https://www.npmjs.com/package/@types/mongodb
-[mongodb-shell]: [https://docs.mongodb.com/getting-started/shell/client/]
+[npm-ngx-bootstrap]: https://www.npmjs.com/package/ngx-bootstrap
+[npm-bootstrap]: https://www.npmjs.com/package/bootstrap
+
+[info-ngx-bootstrap-with-ng-cli]: https://github.com/valor-software/ngx-bootstrap/blob/development/docs/getting-started/ng-cli.md#getting-started-with-angular-cli
+[comment]: https://ponyfoo.com/articles/json-web-tokens-vs-session-cookies
+
+[info-bootstrap4-ngx-cli]: https://github.com/valor-software/ngx-bootstrap/blob/development/docs/getting-started/bootstrap4.md#let-ngx-bootstrap-know-you-are-using-bs4
+
+[comment]:[https://stackoverflow.com/questions/36342890/in-angular2-how-to-know-when-any-form-input-field-lost-focus
+[info-ngx-dynamic-component-loader]:https://angular.io/guide/dynamic-component-loader

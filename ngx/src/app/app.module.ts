@@ -6,19 +6,29 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
+import { ServerService } from './services/server.service';
 import { UserService } from 'app/services/user.service';
 import { LoginComponent } from './login.component';
 import { ProfilComponent } from './profil.component';
+import { ModalLoginComponent } from './modal-login.component';
+import { AutofocusDirective } from './directives/autofocus.directive';
+
+import { AlertModule, ModalModule } from 'ngx-bootstrap';
 
 
 @NgModule({
   declarations: [
-    AppComponent, LoginComponent, ProfilComponent
+    AppComponent, LoginComponent, ProfilComponent,
+    ModalLoginComponent, AutofocusDirective
   ],
   imports: [
-    BrowserModule, FormsModule, HttpModule, AppRoutingModule
+    BrowserModule, FormsModule, HttpModule,
+    ModalModule.forRoot(),
+    AlertModule.forRoot(),
+    AppRoutingModule
   ],
-  providers: [ UserService ],
+  entryComponents: [ ModalLoginComponent ],
+  providers: [ ServerService, UserService ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

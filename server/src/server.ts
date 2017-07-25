@@ -59,16 +59,17 @@ export class Server {
     this._app.use(this.requestHandler.bind(this));
     this._app.use(express.static(path.join(__dirname, 'public')));
     this._app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
-    this._app.use('/ng2', express.static(path.join(__dirname, '../../ng2/dist')));
-    this._app.use('/assets', express.static(path.join(__dirname, '../../ng2/dist/assets')));
+    this._app.use('/ngx', express.static(path.join(__dirname, '../../ngx/dist')));
+    this._app.use('/assets', express.static(path.join(__dirname, '../../ngx/dist/assets')));
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(bodyParser.json());
 
     this._app.use(Auth.expressMiddleware);
-    this._app.post('/auth', Auth.expressMiddlewareAuthenticate, this.handleAuth.bind(this));
+    this._app.post('/login', Auth.expressMiddlewareLogin, this.handleLogin.bind(this));
     this._app.use(bodyParser.urlencoded({ extended: true }) );
     this._app.use(Auth.expressMiddleWareCheckToken);
     this._app.use(this.handleAuthenticatedRequest.bind(this));
+    this._app.post('/auth', Auth.expressMiddlewareAuthenticate, this.handleAuth.bind(this));
     this._app.use('/logout', this.handleLogout.bind(this));
 
     this._app.get('/data/*', this.handleGetData.bind(this));
@@ -140,18 +141,20 @@ export class Server {
   }
 
 
-  private handleAuth (req: IRequestWithToken, res: express.Response, next: express.NextFunction) {
+  private handleLogin (req: IRequestWithToken, res: express.Response, next: express.NextFunction) {
     if (!req.user) {
-      throw new Error('auth fails, missing user');
+      throw new Error('login fails, missing user');
     }
-    if (!req.token) {
-      throw new Error('auth fails, missing token');
-    }
-    debug.fine('handleAuth(): response htlid and token');
     const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    if (!req.remoteToken || !req.accessToken) {
+      throw new Error('login fails, missing token(s)');
+    }
+    debug.fine('handleLogin(): login -> response htlid and tokens');
     DbUser.Instance.login(req.user.htlid, socket);
-    res.json({ htlid: req.user.htlid, token: req.token });
+    res.json({ htlid: req.user.htlid, remoteToken: req.remoteToken, accessToken: req.accessToken });
   }
+
+
 
 
   private handleAuthenticatedRequest (req: IRequestWithUser, res: express.Response, next: express.NextFunction) {
@@ -176,6 +179,20 @@ export class Server {
       return;
     }
     next();
+  }
+
+
+  private handleAuth (req: IRequestWithToken, res: express.Response, next: express.NextFunction) {
+    if (!req.user) {
+      throw new Error('auth fails, missing user');
+    }
+    const socket: string = req.socket.remoteAddress + ':' + req.socket.remotePort;
+    if (!req.accessToken) {
+      throw new Error('auth fails, missing accessToken');
+    }
+    debug.fine('handleAuth(): auth -> response htlid and accessToken');
+    // DbUser.Instance.login(req.user.htlid, socket);
+    res.json({ htlid: req.user.htlid, accessToken: req.accessToken });
   }
 
 
@@ -230,9 +247,26 @@ export class Server {
       // err is thrown inside module jsonwebtoken
       res.status(401);
       debug.fine('response HTTP 401 - Unauthorized')
-      res.render('error401.pug')
+      if (req && req.headers && typeof(req.headers.accept) === 'string' &&
+          req.headers.accept.indexOf('text/html') >= 0 ) {
+        res.render('error401.pug')
+      } else {
+        res.json({ 'error_type': err.name, 'error_description' : err.message } );
+      }
       return;
     }
+    if (err instanceof SyntaxError && typeof(err.message) === 'string' && err.message.indexOf('JSON') >= 0) {
+      res.status(400);
+      debug.fine(err);
+      if (req && req.headers && typeof(req.headers.accept) === 'string' &&
+          req.headers.accept.indexOf('text/html') >= 0 ) {
+        res.render('error400.pug', { error: 'Malformed body', description: err.message} );
+      } else {
+        res.json({ 'error_type': 'Malformed body', 'error_description' : err.message } );
+      }
+      return;
+    }
+
 
     const ts = new Date().toISOString();
     debug.warn('Error %s\n%e', ts, err);
@@ -257,7 +291,8 @@ interface IRequestWithUser extends express.Request {
 }
 
 interface IRequestWithToken extends IRequestWithUser {
-  token: string
+  accessToken: string,
+  remoteToken?: string
 }
 
 

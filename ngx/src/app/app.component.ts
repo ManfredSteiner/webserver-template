@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { UserService, IUser } from './services/user.service';
+import { UserService } from './services/user.service';
+import { User } from './models/user';
 
 @Component({
   selector: 'app-root',
@@ -15,13 +16,13 @@ import { UserService, IUser } from './services/user.service';
 })
 export class AppComponent {
   public title = 'app';
-  public user: IUser;
+  public user: User;
 
   public constructor (private userService: UserService) {
-    userService.user.subscribe(this.handleNewUser.bind(this));
+    userService.subscribe(this.handleNewUser.bind(this));
   }
 
-  private handleNewUser (user: IUser) {
+  private handleNewUser (user: User) {
     this.user = user;
   }
 

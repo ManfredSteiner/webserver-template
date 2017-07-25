@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
+import { ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
 import { UserService } from './services/user.service';
+import { ServerService } from './services/server.service';
 
 @Component({
   selector: 'app-login',
@@ -7,12 +9,12 @@ import { UserService } from './services/user.service';
     <div class="container header">
       <img class="img-responsive center-block" src="../../assets/logo.svg" alt="Logo"/>
       <h1>{{serverName}}</h1>
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <strong>{{errorMessage}}</strong>
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <strong>{{errorMessage}}</strong>
+      </div>
     </div>
-    </div>
-    <div class="container">
+    <div class="container" style="text-align: center">
       <form class="form-signin" #loginForm="ngForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label class="sr-only" for="inputHtlid">HTL-ID</label>
@@ -30,6 +32,12 @@ import { UserService } from './services/user.service';
         </button>
       </form>
     </div>
+    <div class="container" style="margin-top:30px; text-align: center">
+      <!--<app-modal-login #modalLogin></app-modal-login>-->
+      <button class="btn-default center-block" (click)="test()">Login als admin</button>
+    </div>
+
+
   `,
   styles: [ `
      @media (min-width: 400px) { .container { max-width: 400px; } }
@@ -52,25 +60,38 @@ export class LoginComponent {
   public htlid: string;
   public password: string;
 
-  constructor (private userService: UserService) {
+  constructor (private userService: UserService,
+               private serverService: ServerService,
+               private componentFactoryResolver: ComponentFactoryResolver,
+               private viewContainerRef: ViewContainerRef) {
     this.htlid = '';
     this.password = '';
   }
 
   public onSubmit () {
     console.log('Login htlid="' + this.htlid + '" with password="' + this.password + '"');
-    this.userService.login(this.htlid, this.password)
-      .then( user => {
+    this.serverService.login(this.viewContainerRef,
+                             { htlid: this.htlid, password: this.password, stayLoggedIn: true } ).then( accessToken => {
         console.log('Login succeeded');
-        console.log(user);
+        // this.serverService.getLoginUser(this.viewContainerRef, accessToken).then( user => {
+        //   console.log(user);
       })
-      .catch( err => {
-        this.errorMessage = 'Login fails';
-        setTimeout( () => { this.errorMessage = undefined }, 2000);
-        console.log(err);
-      });
-
+    .catch( this.handleError.bind(this));
   }
 
+  // https://medium.com/@tudorgergely/injecting-components-dynamically-in-angular-2-3d36594d49a0
+
+  public test () {
+    this.serverService.httpGet('/data/time', this.viewContainerRef).then( result => {
+      console.log(result);
+    }).catch( err => console.log(err));
+  }
+
+
+  private handleError (err: Error) {
+    this.errorMessage = 'Login fails';
+    setTimeout( () => { this.errorMessage = undefined }, 2000);
+    console.log(err);
+  }
 
 }
