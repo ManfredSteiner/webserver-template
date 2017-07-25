@@ -28,7 +28,7 @@ Same situation if user has logged out. In this case, all previous given tokens (
 and remote token) are not longer useable.
 
 Remote tokens are valid for the same day. So re-login is needed on next day.  
-Renewing an access token is done automatically by the [UserService][ngx/src/services/user.service.ts]. 
+Renewing an access token is done automatically by the [ServerService](ngx/src/app/services/server.service.ts). 
 If the remote token is not longer valid, a modal login dialog with the previously used htlid is opened 
 automatically.
 
@@ -67,7 +67,7 @@ cd ..
 
 ## Usage
 
-The [ServerService](ngx/src/services/server.service.ts) checks if Angular application is running 
+The [ServerService](ngx/src/app/services/server.service.ts) checks if Angular application is running 
 in development mode or in production mode. The mode descides which server host is used for requests.
 
 #### Development mode
