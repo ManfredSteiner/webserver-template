@@ -1,4 +1,4 @@
-# Modal dialogs with Angular 2+
+# Modal dialogs with Angular 4
 
 This step continues **[step9-mongodb](../../blob/step9-mongodb/README.md)**.
 
@@ -11,17 +11,19 @@ This step continues **[step9-mongodb](../../blob/step9-mongodb/README.md)**.
 #### Client side (Angular v4)
 
 * How to use Bootstrap V4
+* How to use **Font Awesome Icons** as replacement for Bootstrap glyphicons
 * How to implement the modal dialogs.
 * How to user modal dialogs for login.
 * How to dynamically create and remove components.
 * How to handle authentication if user logout from another session.
+* How ro implement a non angular login page
  
 #### Desired behavior
 
 Short term access token allow access on server data. If access fails the long term 
 remote token can be used to get a new access token.
 
-A new user login makes token in other session unuseable. In this case a modal login 
+A new user login makes token of other sessions unuseable. In this case a modal login 
 dialog should appear to relogin.
 
 Same situation if user has logged out. In this case, all previous given tokens (access token 
@@ -62,6 +64,7 @@ Install the module ...
 ```
 cd ngx
 npm install --save ngx-bootstrap bootstrap@next
+npm install --save font-awesome
 cd ..
 ```
 
@@ -98,6 +101,24 @@ cd server
 npm start
 ```
 
+## Non Angular login page
+
+Open this login page with [http://localhost:8080/login](http://localhost:8080/login). There 
+is no additional login functionality implemented now.
+
+See [server/src/views/login.pug](server/src/views/login.pug) and [server/src/views/login-style.pug](server/src/views/login-style.pug) 
+how to implement:
+
+* A fast loading login page, because Angular is not used for this page.
+* How to implement an eye button beside the password field to show or hide password input.
+* How to use responsive CSS to decrease icon and server name on small devices (smartphones).
+* How to create a complex HTML page using pug rendering engine.
+
+Font Awesome Icons are used, because Boootstrap V4 drops support for Glyphicons. Font Awesome is 
+fully open source and is GPL friendly.  
+See [http://fontawesome.io/icons/][info-fontawesome-icons].
+
+
 ## Additional infos
 
 * [How to use the ngx-bootstrap component **AlertModule**][info-ngx-bootstrap-with-ng-cli]
@@ -114,3 +135,4 @@ npm start
 
 [comment]:[https://stackoverflow.com/questions/36342890/in-angular2-how-to-know-when-any-form-input-field-lost-focus
 [info-ngx-dynamic-component-loader]:https://angular.io/guide/dynamic-component-loader
+[info-fontawesome-icons]: http://fontawesome.io/icons/

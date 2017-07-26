@@ -61,11 +61,12 @@ export class Server {
     this._app.use('/node_modules', express.static(path.join(__dirname, '../node_modules')));
     this._app.use('/ngx', express.static(path.join(__dirname, '../../ngx/dist')));
     this._app.use('/assets', express.static(path.join(__dirname, '../../ngx/dist/assets')));
+    this._app.use('/public', express.static(path.join(__dirname, '../dist/public')));
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(bodyParser.json());
 
     this._app.use(Auth.expressMiddleware);
-    this._app.post('/login', Auth.expressMiddlewareLogin, this.handleLogin.bind(this));
+    this._app.post('/login', Auth.expressMiddlewareLogin, this.handlePostLogin.bind(this));
     this._app.use(bodyParser.urlencoded({ extended: true }) );
     this._app.use(Auth.expressMiddleWareCheckToken);
     this._app.use(this.handleAuthenticatedRequest.bind(this));
@@ -126,13 +127,17 @@ export class Server {
   private requestHandler (req: express.Request, res: express.Response, next: express.NextFunction) {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
     debug.info('%s %s from %s', req.method, req.url, clientSocket);
-    if (req.method === 'GET' &&
-        (req.url === '/' || req.url === '/index.html' || req.url === '/login' ||
-         req.url.startsWith('/app')) ) {
-      res.render('ngmain.pug');
-    } else {
-      next();
+    if (req.method === 'GET') {
+      if (req.url === '/' || req.url === '/index.html' || req.url.startsWith('/app') ) {
+        res.render('ngmain.pug');
+        return;
+      } else if ( req.url === '/login') {
+        res.render('login.pug',
+          { servername: 'webserver', checkbox: { visible: true, checked: true, text: 'Eingeloggt bleiben'}, showSize: false });
+        return;
+      }
     }
+    next();
   }
 
 
@@ -141,7 +146,7 @@ export class Server {
   }
 
 
-  private handleLogin (req: IRequestWithToken, res: express.Response, next: express.NextFunction) {
+  private handlePostLogin (req: IRequestWithToken, res: express.Response, next: express.NextFunction) {
     if (!req.user) {
       throw new Error('login fails, missing user');
     }
