@@ -121,6 +121,15 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to handle server startup and shutdown with Promises.
   + How to handle nested database schemes.
 
+* [step10-modal-dialog](../../blob/step10-modal-dialog/README.md)
+  + How to support (server-side) and use (client-side) [Bootstrap V4][bootstrap-v4]
+  + How to implement the modal dialogs.
+  + How to user modal dialogs for login.
+  + How to dynamically create and remove components.
+  + How to handle authentication if user logout from another session.
+  + How to implement a non angular login page.
+  + How to use [Font Awesome Icons][font-awesome-icons] as replacement for Bootstrap V3 Glyphicons.
+
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
@@ -134,3 +143,5 @@ Use command `git checkout <branch>` to get one of the following branches:
 [bootstrap-css]: http://getbootstrap.com/css/
 [npm-sprintf-js]: https://www.npmjs.com/package/sprintf-js
 [npm-spin]: https://www.npmjs.com/package/spin
+[bootstrap-v4]: https://v4-alpha.getbootstrap.com/
+[font-awesome-icons]: http://fontawesome.io/icons/

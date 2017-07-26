@@ -4,5 +4,6 @@
     "**/node_modules/": true,
     "**/.gitkeep": true,
     ".vscode/": true
-  }
+  },
+  "git.ignoreLimitWarning": true
 }
