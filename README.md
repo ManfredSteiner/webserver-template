@@ -6,17 +6,18 @@ This step continues **[step9-mongodb](../../blob/step9-mongodb/README.md)**.
 
 #### Server side (Node.js express)
 
-* How to support Bootstrap V4
+* How to support Bootstrap V4.
+* How ro implement a non angular login page.
+* How to use **Font Awesome Icons** as replacement for Bootstrap V3 Glyphicons.
 
 #### Client side (Angular v4)
 
-* How to use Bootstrap V4
-* How to use **Font Awesome Icons** as replacement for Bootstrap glyphicons
+* How to use Bootstrap V4.
 * How to implement the modal dialogs.
 * How to user modal dialogs for login.
 * How to dynamically create and remove components.
 * How to handle authentication if user logout from another session.
-* How ro implement a non angular login page
+
  
 #### Desired behavior
 
