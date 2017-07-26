@@ -7,7 +7,7 @@ This step continues **[step9-mongodb](../../blob/step9-mongodb/README.md)**.
 #### Server side (Node.js express)
 
 * How to support Bootstrap V4.
-* How ro implement a non angular login page.
+* How to implement a non angular login page.
 * How to use **Font Awesome Icons** as replacement for Bootstrap V3 Glyphicons.
 
 #### Client side (Angular v4)
@@ -115,9 +115,9 @@ how to implement:
 * How to use responsive CSS to decrease icon and server name on small devices (smartphones).
 * How to create a complex HTML page using pug rendering engine.
 
-Font Awesome Icons are used, because Boootstrap V4 drops support for Glyphicons. Font Awesome is 
-fully open source and is GPL friendly.  
-See [http://fontawesome.io/icons/][info-fontawesome-icons].
+Font Awesome Icons are used, because Boootstrap V4 drops support for Glyphicons.  
+Font Awesome is fully open source and is GPL friendly, 
+see [http://fontawesome.io/icons/][info-fontawesome-icons].
 
 
 ## Additional infos
