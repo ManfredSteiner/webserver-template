@@ -89,7 +89,6 @@ export class ModalLoginComponent  {
     return new Promise<any> ( (resolve, reject) => {
       this._resolve = resolve;
       this._reject = reject;
-      console.log('show');
       this.childModal.show();
 
       // needed beacuse autofocus does not work in modal

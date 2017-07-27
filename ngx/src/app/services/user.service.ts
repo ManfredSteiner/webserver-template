@@ -24,6 +24,10 @@ export class UserService {
     return this._user;
   }
 
+  public init (htlid: string, remoteToken: string) {
+    this.serverService.reset(htlid, remoteToken);
+  }
+
   public logout (viewContainerRef: ViewContainerRef): Promise<void> {
     if (!this._user) {
       return Promise.reject(new Error('No user logged in'));

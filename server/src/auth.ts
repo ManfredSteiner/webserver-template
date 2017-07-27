@@ -155,8 +155,6 @@ class MyPassport {
 
   public verify (req: express.Request, username: string, password: string,
                  done: (error: any, user?: any, options?: IVerifyOptions) => void) {
-    debug.fine('?--> Passport.verify()');
-
     const user = DbUser.Instance.getCachedUser(username);
     const htlid = username;
     if (! (user instanceof User)) {
@@ -180,7 +178,6 @@ class MyPassport {
   }
 
   public authenticate (req: express.Request, res: express.Response, next: express.NextFunction) {
-    debug.fine('?--> Passport.__authenticate()');
     if (!req.body.htlid) {
       // res.status(400).json({ 'error_type' : 'malformed_json', 'error_description' : 'missing htlid' });
       next(new DbAuthError('cannot authenticate, missing htlid', req.user));

@@ -34,9 +34,11 @@ export class ServerService {
     return this._serverUrl;
   }
 
-  public reset () {
-    this._authResponse = { htlid: undefined, remoteToken: '', accessToken: '' };
+  public reset (htlid?: string, remoteToken?: string, accessToken?: string) {
+    this._authResponse = { htlid: htlid, remoteToken: remoteToken, accessToken: accessToken };
+    this._loginHtlidSubject.next(this._authResponse.htlid);
   }
+
 
   public httpGet (url: string, viewContainerRef: ViewContainerRef, options?: RequestOptions): Promise<Response> {
     return new Promise<Response>( (resolve, reject) => {
@@ -84,7 +86,6 @@ export class ServerService {
 
   public authenticate (viewContainerRef: ViewContainerRef, refreshAcessToken?: boolean): Promise<string> {
     return new Promise<string>( (resolve, reject) => {
-      console.log('---> 1');
 
       if (this._authResponse && this._authResponse.accessToken && refreshAcessToken) {
         this._authResponse.accessToken = undefined;
@@ -103,9 +104,7 @@ export class ServerService {
           'Authorization': 'Bearer ' + remoteToken
         });
         const optionsPost = new RequestOptions({ headers: headers });
-        console.log('---> 2');
         this.http.post(this._serverUrl + '/auth', { htlid: this._authResponse.htlid }, optionsPost).toPromise().then( response => {
-          console.log('---> 3');
           const res: ILoginResponse = response.json();
           if (res && res.htlid === this._authResponse.htlid &&
               typeof(res.accessToken) === 'string' && res.accessToken.length > 0) {
@@ -115,11 +114,10 @@ export class ServerService {
             reject(new Error('invalid server response on post /auth'));
           }
         }).catch( err => {
-          console.log('---> 4');
           if (err instanceof Response) {
             if ((<Response>err).status === 401) {
               this._authResponse.remoteToken = undefined;
-              this.login(viewContainerRef).then( accessToken2 => {
+              this.login(viewContainerRef, 'Passwort erforderlich').then( accessToken2 => {
                 resolve(accessToken2);
               }).catch( err2 => {
                 reject(err2);
@@ -130,26 +128,28 @@ export class ServerService {
         return;
       }
 
-      this.login(viewContainerRef).then( accessToken3 => {
+      this.login(viewContainerRef, 'Anmeldung erforderlich', this._authResponse && this._authResponse.htlid).then( accessToken3 => {
         resolve(accessToken3);
       }).catch( err => reject(err) );
 
     });
   }
 
-  public login (viewContainerRef: ViewContainerRef, loginData?: IUserLogin): Promise<string> {
+  public login (viewContainerRef: ViewContainerRef, title?: string, htlid?: string, loginData?: IUserLogin): Promise<string> {
     let promise: Promise<IUserLogin>;
     if (loginData) {
       if (typeof(loginData.htlid) !== 'string' || loginData.htlid.length < 1) {
-        return Promise.reject(new Error('invalid argument logiData (htlid)'));
+        return Promise.reject(new Error('invalid argument loginData (htlid)'));
+      }
+      if (typeof(htlid) !== 'string' || (htlid && htlid !== loginData.htlid)) {
+        return Promise.reject(new Error('invalid argument loginData (htlid)'));
       }
       if (typeof(loginData.password) === 'string' && loginData.password.length > 0) {
         promise = Promise.resolve(loginData);
       }
     }
     if (!promise) {
-      // promise = this.performModalLoginDialog(viewContainerRef, loginData && loginData.htlid);
-      promise = this.performModalLoginDialog(viewContainerRef, 'admin');
+      promise = this.performModalLoginDialog(viewContainerRef, title, htlid);
     }
 
     return new Promise<string>( (resolve, reject) => {
@@ -217,14 +217,14 @@ export class ServerService {
     return this.http.post(this._serverUrl + url, body, options).toPromise();
   }
 
-  private performModalLoginDialog (viewContainerRef: ViewContainerRef, htlid?: string): Promise<IUserLogin> {
+  private performModalLoginDialog (viewContainerRef: ViewContainerRef, title?: string, htlid?: string): Promise<IUserLogin> {
     const factory = this.componentFactoryResolver.resolveComponentFactory(ModalLoginComponent);
     const modalLoginRef = viewContainerRef.createComponent(factory);
     modalLoginRef.changeDetectorRef.detectChanges();
     const modalLoginComponent: ModalLoginComponent = (<any>modalLoginRef)._component;
     htlid = htlid || this._authResponse && this._authResponse.htlid;
     return new Promise<IUserLogin>( (resolve, reject) => {
-      modalLoginComponent.show('Authorisierung', htlid).then ( (result) => {
+      modalLoginComponent.show(title || 'Authorisierung', htlid).then ( (result) => {
         const index = viewContainerRef.indexOf(<any>modalLoginRef);
         viewContainerRef.remove(index);
         resolve(result);

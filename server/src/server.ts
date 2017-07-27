@@ -64,6 +64,7 @@ export class Server {
     this._app.use('/public', express.static(path.join(__dirname, '../dist/public')));
     this._app.get('/error', this.handleGetError.bind(this));
     this._app.use(bodyParser.json());
+    this._app.use(bodyParser.urlencoded({ extended: true }) );
 
     this._app.use(Auth.expressMiddleware);
     this._app.post('/login', Auth.expressMiddlewareLogin, this.handlePostLogin.bind(this));
@@ -128,12 +129,12 @@ export class Server {
     const clientSocket = req.socket.remoteAddress + ':' + req.socket.remotePort;
     debug.info('%s %s from %s', req.method, req.url, clientSocket);
     if (req.method === 'GET') {
-      if (req.url === '/' || req.url === '/index.html' || req.url.startsWith('/app') ) {
+      if ( req.url.startsWith('/app') ) {
         res.render('ngmain.pug');
         return;
-      } else if ( req.url === '/login') {
+      } else if (req.url === '/' || req.url === '/index.html' || req.url === '/login') {
         res.render('login.pug',
-          { servername: 'webserver', checkbox: { visible: true, checked: true, text: 'Eingeloggt bleiben'}, showSize: false });
+          { servername: 'webserver', checkbox: { visible: false, checked: true, text: 'Eingeloggt bleiben'}, showSize: false });
         return;
       }
     }
@@ -154,9 +155,16 @@ export class Server {
     if (!req.remoteToken || !req.accessToken) {
       throw new Error('login fails, missing token(s)');
     }
-    debug.fine('handleLogin(): login -> response htlid and tokens');
     DbUser.Instance.login(req.user.htlid, socket);
-    res.json({ htlid: req.user.htlid, remoteToken: req.remoteToken, accessToken: req.accessToken });
+    if (req.headers['content-type'] === 'application/json') {
+      // login request send from ngx application, response json
+      debug.fine('handleLogin(): login -> response htlid and tokens');
+      res.json({ htlid: req.user.htlid, remoteToken: req.remoteToken, accessToken: req.accessToken });
+    } else {
+      // login request send from non ngx html form, response ngx application
+      debug.fine('handleLogin(): login (urlenc) -> response ngmain including htlid and tokens');
+      res.render('ngmain.pug', { htlid: req.user.htlid, token: req.remoteToken });
+    }
   }
 
 
