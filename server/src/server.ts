@@ -133,8 +133,12 @@ export class Server {
         res.render('ngmain.pug');
         return;
       } else if (req.url === '/' || req.url === '/index.html' || req.url === '/login') {
-        res.render('login.pug',
-          { servername: 'webserver', checkbox: { visible: false, checked: true, text: 'Eingeloggt bleiben'}, showSize: false });
+        res.render('login.pug', {
+                                  servername: 'webserver',
+                                  checkbox: { visible: false, checked: true, text: 'Eingeloggt bleiben'},
+                                  showSize: false,
+                                  showButtonPasswordEye: true
+                                });
         return;
       }
     }

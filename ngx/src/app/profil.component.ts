@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { Http, RequestOptions, Headers } from '@angular/http';
+
 import { UserService } from './services/user.service';
 import { ServerService } from './services/server.service';
 
@@ -43,7 +44,9 @@ export class ProfilComponent implements OnInit {
 
   public onLogout () {
     console.log('Logout');
-    this.userService.logout(this.viewContainerRef).catch( error => {
+    this.userService.logout(this.viewContainerRef).then ( () => {
+      console.log('Logged out');
+    }).catch( error => {
       console.log(error);
       this.serverError = 'Logout fails';
       setTimeout( () => { this.serverError = undefined; }, 3000);

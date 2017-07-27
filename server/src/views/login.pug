@@ -111,16 +111,18 @@ html(lang="de")
             = 'Password'
           input.form-control(type="password" name="password" placeholder="Password" required autofocus)
         else
-          input.form-control(type="text" name="htlid" placeholder="HTL-ID" required autofocus) 
-          .input-group
+          div.form-group
+            input#input-htlid.form-control(type="text" name="htlid" placeholder="HTL-ID" required autofocus)
+          div.form-group.input-group
             label.sr-only(for="inputPassword")
               = 'Password'
             input#input-password.form-control(type="password" name="password" placeholder="Password" required)
-            span.input-group-btn
-              button#button-eye.btn.btn-secondary(type="button", style="margin-bottom:10px; display:block" onClick='togglePasswordVisibility()')
-                i.fa.fa-eye
-              button#button-eye-slash.btn.btn-secondary(type="button", style="margin-bottom:10px; display:none" onClick='togglePasswordVisibility()')
-                i.fa.fa-eye-slash
+            if showButtonPasswordEye
+              span.input-group-btn
+                button#button-eye.btn.btn-secondary(type="button", style="display:block" onClick='togglePasswordVisibility()')
+                  i.fa.fa-eye
+                button#button-eye-slash.btn.btn-secondary(type="button", style="display:none" onClick='togglePasswordVisibility()')
+                  i.fa.fa-eye-slash
         if checkbox && checkbox.visible 
           .checkbox
             label

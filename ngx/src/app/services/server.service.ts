@@ -4,7 +4,7 @@ import { Http, Response, RequestOptions, Headers } from '@angular/http';
 import 'rxjs/add/operator/toPromise';
 import {Subject} from 'rxjs/Rx';
 
-import { ModalLoginComponent } from '../modal-login.component';
+import { ModalLoginComponent, IModalLoginConfig } from '../modal-login.component';
 import { User, IUser, IUserLogin } from '../models/user';
 
 
@@ -117,7 +117,12 @@ export class ServerService {
           if (err instanceof Response) {
             if ((<Response>err).status === 401) {
               this._authResponse.remoteToken = undefined;
-              this.login(viewContainerRef, 'Passwort erforderlich').then( accessToken2 => {
+              const config: IModalLoginConfig = { 
+                      title: 'Passwort erforderlich', 
+                      htlid: this._authResponse && this._authResponse.htlid,
+                      loginButtonText: 'Weiter'
+                    };
+              this.login(viewContainerRef, config).then( accessToken2 => {
                 resolve(accessToken2);
               }).catch( err2 => {
                 reject(err2);
@@ -128,28 +133,33 @@ export class ServerService {
         return;
       }
 
-      this.login(viewContainerRef, 'Anmeldung erforderlich', this._authResponse && this._authResponse.htlid).then( accessToken3 => {
+      const config: IModalLoginConfig = { 
+        title: 'Anmeldung erforderlich', 
+        htlid: this._authResponse && this._authResponse.htlid,
+        loginButtonText: 'Anmelden'
+      };
+      this.login(viewContainerRef, config).then( accessToken3 => {
         resolve(accessToken3);
       }).catch( err => reject(err) );
 
     });
   }
 
-  public login (viewContainerRef: ViewContainerRef, title?: string, htlid?: string, loginData?: IUserLogin): Promise<string> {
+  public login (viewContainerRef: ViewContainerRef, config?: IModalLoginConfig, loginData?: IUserLogin): Promise<string> {
     let promise: Promise<IUserLogin>;
     if (loginData) {
       if (typeof(loginData.htlid) !== 'string' || loginData.htlid.length < 1) {
         return Promise.reject(new Error('invalid argument loginData (htlid)'));
       }
-      if (typeof(htlid) !== 'string' || (htlid && htlid !== loginData.htlid)) {
-        return Promise.reject(new Error('invalid argument loginData (htlid)'));
+      if (config && config.htlid && config.htlid !== loginData.htlid) {
+        return Promise.reject(new Error('invalid argument loginData (wrong htlid)'));
       }
       if (typeof(loginData.password) === 'string' && loginData.password.length > 0) {
         promise = Promise.resolve(loginData);
       }
     }
     if (!promise) {
-      promise = this.performModalLoginDialog(viewContainerRef, title, htlid);
+      promise = this.performModalLoginDialog(viewContainerRef, config);
     }
 
     return new Promise<string>( (resolve, reject) => {
@@ -217,14 +227,18 @@ export class ServerService {
     return this.http.post(this._serverUrl + url, body, options).toPromise();
   }
 
-  private performModalLoginDialog (viewContainerRef: ViewContainerRef, title?: string, htlid?: string): Promise<IUserLogin> {
+  private performModalLoginDialog (viewContainerRef: ViewContainerRef, config?: IModalLoginConfig): Promise<IUserLogin> {
     const factory = this.componentFactoryResolver.resolveComponentFactory(ModalLoginComponent);
     const modalLoginRef = viewContainerRef.createComponent(factory);
     modalLoginRef.changeDetectorRef.detectChanges();
     const modalLoginComponent: ModalLoginComponent = (<any>modalLoginRef)._component;
-    htlid = htlid || this._authResponse && this._authResponse.htlid;
+    if (!config) {
+      config = {};
+    }
+    config.htlid = config.htlid || this._authResponse && this._authResponse.htlid;
+    config.title = config.title || 'Authorisierung';
     return new Promise<IUserLogin>( (resolve, reject) => {
-      modalLoginComponent.show(title || 'Authorisierung', htlid).then ( (result) => {
+      modalLoginComponent.show(config).then ( (result) => {
         const index = viewContainerRef.indexOf(<any>modalLoginRef);
         viewContainerRef.remove(index);
         resolve(result);

@@ -40,6 +40,10 @@ export class AppComponent implements OnInit {
 
   private handleNewUser (user: User) {
     this.user = user;
+    if (!user) {
+      console.log('Redirect to /login');
+      window.location.href = '/login';
+    }
   }
 
 }
