@@ -88,5 +88,14 @@ You can also use another host for the client, as long as the server is reachable
 
 ## Additional infos
 
+Additional styles (Bootstrap V4, Font Awesome) are now imported inside [ngx/src/styles.css](ngx/src/styles.css).
+
+The usage depends on Angular mode:
+
+* Productive mode:  
+  Content in file *ngx/dist/styles.bundle.css*, used in file [server/src/views/ngmain.pug](server/src/views/ngmain.pug)
+* Development mode:  
+  Content in resource *styles.bundle.js*, used in file [ngx/src/index.html](ngx/src/index.html)
+
 
 [mongodb-install]: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
