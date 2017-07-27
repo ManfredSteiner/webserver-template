@@ -95,7 +95,8 @@ The usage depends on Angular mode:
 * Productive mode:  
   Content in file *ngx/dist/styles.bundle.css*, used in file [server/src/views/ngmain.pug](server/src/views/ngmain.pug)
 * Development mode:  
-  Content in resource *styles.bundle.js*, used in file [ngx/src/index.html](ngx/src/index.html)
+  Content in resource *styles.bundle.js*, added automatically to file [ngx/src/index.html](ngx/src/index.html) when 
+  executing `ng serve` (checkable in browser debugging mode).
 
 
 [mongodb-install]: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
