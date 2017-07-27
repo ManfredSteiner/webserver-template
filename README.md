@@ -130,6 +130,14 @@ Use command `git checkout <branch>` to get one of the following branches:
   + How to implement a non angular login page.
   + How to use [Font Awesome Icons][font-awesome-icons] as replacement for Bootstrap V3 Glyphicons.
 
+* [step11-non-ngx-login](../../blob/step11-non-ngx-login/README.md)
+  + How to support /login resource with non angular page.
+  + How to use modal login dialog in all other cases automatically.
+  + How to transport remote token to the Angular application.
+  + How to handle logout in order to exit from Angular application.
+  + How to take over remote token on startup.
+  + How to open modal login dialog authomatically on startup.
+
   
 [nodejs]: https://nodejs.org/en/
 [express]: https://github.com/expressjs/express
